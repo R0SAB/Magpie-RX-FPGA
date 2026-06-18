@@ -21,6 +21,21 @@ test_pll inst_pll
 
 
 wire [31:0]f0;
+reg [7:0]s_meter_test;
+reg [31:0]div;
+
+always @ (posedge clk_27M)
+begin
+    if(div < 5400000) div <= div + 1;
+    else
+    begin
+        div <= 0;
+
+        if(s_meter_test < 15) s_meter_test <= s_meter_test + 1;
+        else s_meter_test <= 0;
+    end
+end
+
 
 spi_interface inst_spi
 (
@@ -30,7 +45,7 @@ spi_interface inst_spi
     .spi_sck(spi_sck),
 
     .f0_word_out(f0),
-    .s_meter_value_in(133)
+    .s_meter_value_in(s_meter_test)
 );
 
 
