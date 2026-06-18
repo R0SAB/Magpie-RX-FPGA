@@ -26,7 +26,7 @@ reg [31:0]div;
 
 always @ (posedge clk_27M)
 begin
-    if(div < 5400000) div <= div + 1;
+    if(div < 8000000) div <= div + 1;
     else
     begin
         div <= 0;
