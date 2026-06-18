@@ -30,7 +30,7 @@ spi_interface inst_spi
     .spi_sck(spi_sck),
 
     .f0_word_out(f0),
-    .s_meter_value_in()
+    .s_meter_value_in(133)
 );
 
 
