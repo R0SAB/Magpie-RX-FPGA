@@ -19,7 +19,7 @@ begin
     if(~spi_cs) f0_shreg <= {f0_shreg[30:0], spi_mosi};
 end
 
-always @ (posedge spi_cs) f0_word <= f0_shreg;
+always @ (posedge spi_cs) f0_word_out <= f0_shreg;
 
 
 endmodule
