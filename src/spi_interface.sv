@@ -8,20 +8,33 @@ module spi_interface        // MODE 3
     input wire clk_27M,
 
     output reg [31:0]f0_word_out,
+    output wire [1:0]modulation_out,
+    output wire [1:0]bandwidth_out,
     input wire [7:0]s_meter_value_in
 );
 
-
+reg [7:0]mode_ctrl;
+reg [7:0]mode_ctrl_shreg;
 reg [31:0]f0_shreg;
 reg [7:0]s_meter_shreg;
 
+assign modulation_out[1:0] = mode_ctrl[1:0];
+assign bandwidth_out[1:0] = mode_ctrl[3:2];
+
 always @ (posedge spi_sck)
 begin
-    if(~spi_cs) f0_shreg <= {f0_shreg[30:0], spi_mosi};
+    if(~spi_cs)
+    begin
+        f0_shreg <= {f0_shreg[30:0], spi_mosi};
+        mode_ctrl_shreg <= {mode_ctrl_shreg[6:0], f0_shreg[31]};
+    end
 end
 
-always @ (posedge spi_cs)f0_word_out <= f0_shreg;
-
+always @ (posedge spi_cs)
+begin
+    f0_word_out <= f0_shreg;
+    mode_ctrl <= mode_ctrl_shreg;
+end
 
 always @(negedge spi_sck or posedge spi_cs)
 begin

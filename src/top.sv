@@ -7,7 +7,14 @@ module top
 	output wire spi_miso,
 	input wire spi_cs,
 
-	output wire probe
+	output wire probe,
+
+    output wire led_1,
+    output wire led_2,
+    output wire led_3,
+    output wire led_4,
+    output wire led_5,
+    output wire led_6
 );
 
 
@@ -36,6 +43,8 @@ begin
     end
 end
 
+wire [1:0]modulation;
+wire [1:0]bandwidth;
 
 spi_interface inst_spi
 (
@@ -45,6 +54,9 @@ spi_interface inst_spi
     .spi_sck(spi_sck),
 
     .f0_word_out(f0),
+    .modulation_out(modulation),
+    .bandwidth_out(bandwidth),
+
     .s_meter_value_in(s_meter_test)
 );
 
@@ -54,6 +66,13 @@ reg[31:0]ph_acc;
 always @ (posedge clk_65M) ph_acc <= ph_acc + f0;
 assign probe = ph_acc[31];
 
+
+assign led_1 = (modulation == 0) ? 0 : 1;
+assign led_2 = (modulation == 1) ? 0 : 1;
+assign led_3 = (modulation == 2) ? 0 : 1;
+assign led_4 = (bandwidth  == 0) ? 0 : 1;
+assign led_5 = (bandwidth  == 1) ? 0 : 1;
+assign led_6 = (bandwidth  == 2) ? 0 : 1;
 
 
 endmodule
