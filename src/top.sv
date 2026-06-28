@@ -14,17 +14,15 @@ module top
     output wire led_3,
     output wire led_4,
     output wire led_5,
-    output wire led_6
+    output wire led_6,
+
+    input wire signed [13:0]adc_in,
+    input wire adc_dry
 );
 
 
 wire clk_65M;
-
-test_pll inst_pll
-(
-    .clkout(clk_65M),
-    .clkin(clk_27M)
-);
+assign clk_65M = adc_dry;
 
 
 wire [31:0]f0;
