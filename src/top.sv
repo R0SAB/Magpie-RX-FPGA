@@ -21,8 +21,8 @@ module top
 );
 
 
-wire clk_65M;
-assign clk_65M = adc_dry;
+wire clk_70M;
+assign clk_70M = adc_dry;
 
 
 wire [31:0]f0;
@@ -61,7 +61,7 @@ spi_interface inst_spi
 
 reg[31:0]ph_acc;
 
-always @ (posedge clk_65M) ph_acc <= ph_acc + f0;
+always @ (posedge clk_70M) ph_acc <= ph_acc + f0;
 assign probe = ph_acc[31];
 
 
