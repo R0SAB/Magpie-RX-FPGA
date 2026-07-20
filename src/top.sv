@@ -25,7 +25,6 @@ wire clk_70M;
 assign clk_70M = adc_dry;
 
 
-wire [31:0]f0;
 reg [7:0]s_meter_test;
 reg [31:0]div;
 
@@ -41,6 +40,12 @@ begin
     end
 end
 
+
+
+
+// ######################### SPI INTERFACE ###########################
+
+wire [31:0]f0;
 wire [1:0]modulation;
 wire [1:0]bandwidth;
 
@@ -59,18 +64,30 @@ spi_interface inst_spi
 );
 
 
-reg[31:0]ph_acc;
+// ############################ HETERODYNE ###########################
 
-always @ (posedge clk_70M) ph_acc <= ph_acc + f0;
-assign probe = ph_acc[31];
+wire [14:0]het_I;
+wire [14:0]het_Q;
+
+heterodyne inst_heterodyne
+(
+    .adc_in(adc_in),
+    .f0(f0),
+    .clk_70M(clk_70M),
+
+    .I_out(het_I),
+    .Q_out(het_Q)
+);
 
 
-assign led_1 = (modulation == 0) ? 0 : 1;
-assign led_2 = (modulation == 1) ? 0 : 1;
-assign led_3 = (modulation == 2) ? 0 : 1;
-assign led_4 = (bandwidth  == 0) ? 0 : 1;
-assign led_5 = (bandwidth  == 1) ? 0 : 1;
-assign led_6 = (bandwidth  == 2) ? 0 : 1;
+// ########################### SD DAC ##############################
 
+SD_DAC inst_test_dac
+(
+    .DACout(probe),
+    .DACin({het_I, 1'b0} + (1 << 15)),
+    .Clk(clk_70M),
+    .en(1)
+);
 
 endmodule

@@ -5,9 +5,18 @@
     <Version>5</Version>
     <Device name="GW1NR-9C" pn="GW1NR-LV9QN88PC6/I5">gw1nr9c-004</Device>
     <FileList>
+        <File path="src/SD_DAC.v" type="file.verilog" enable="1"/>
+        <File path="src/cordic_pipeline_sincos.v" type="file.verilog" enable="1"/>
         <File path="src/gowin_rpll/test_rpll.v" type="file.verilog" enable="1"/>
+        <File path="src/heterodyne.sv" type="file.verilog" enable="1"/>
         <File path="src/spi_interface.sv" type="file.verilog" enable="1"/>
         <File path="src/top.sv" type="file.verilog" enable="1"/>
         <File path="src/Magpie_RX.cst" type="file.cst" enable="1"/>
+        <File path="src/fir_coeffs/decim_fir1.txt" type="file.other" enable="1"/>
+        <File path="src/fir_coeffs/decim_fir2.txt" type="file.other" enable="1"/>
+        <File path="src/fir_coeffs/fir_0k3.txt" type="file.other" enable="1"/>
+        <File path="src/fir_coeffs/fir_2k8.txt" type="file.other" enable="1"/>
+        <File path="src/fir_coeffs/fir_4k8.txt" type="file.other" enable="1"/>
+        <File path="src/fir_coeffs/fir_hilbert.txt" type="file.other" enable="1"/>
     </FileList>
 </Project>
