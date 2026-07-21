@@ -95,8 +95,8 @@ downsampler inst_downsampler
 
 // ########################### SD DAC ##############################
 
-wire signed [17:0]test_wire;
-assign test_wire = inst_downsampler.cic_I_out;
+wire signed [19:0]test_wire;
+assign test_wire = inst_downsampler.fir_1_I_out;
 
 SD_DAC inst_test_dac
 (

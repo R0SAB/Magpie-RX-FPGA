@@ -4,7 +4,7 @@ module downsampler
     input wire signed [14:0]het_Q_in,
     input wire clk_70M,
 
-    output wire clk_44k
+    output reg clk_44k
 
 );
 
@@ -15,7 +15,7 @@ reg clk_882k;
 reg [7:0]div_220k;
 reg clk_220k;
 reg [7:0]div_44k;
-reg clk_44k;
+// reg clk_44k is an output port
 
 always @ (posedge clk_70M)
 begin
@@ -81,6 +81,30 @@ inst_cic_Q
     .out(cic_Q_out)
 );
 
+// ########################## FIR 1 #############################
+
+wire signed [19:0]fir_1_I_out;
+wire signed [19:0]fir_1_Q_out;
+
+fir
+#(
+	.ORDER(70),
+	.IN_MSB(17),
+	.OUT_MSB(19),
+	.TAPS_MSB(17),
+	.GAIN_BITS(4),
+	.ROM_FILE("src/fir_coeffs/decim_fir1.txt"),
+	.SAMP_SKIP(0)
+)
+inst_fir_1
+(
+	.clk_H(clk_70M),
+	.samp_clk(clk_882k),
+	.in_1(cic_I_out),
+	.in_2(cic_Q_out),
+    .out_1(fir_1_I_out),
+	.out_2(fir_1_Q_out)
+);
 
 
 
