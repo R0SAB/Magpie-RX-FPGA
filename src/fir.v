@@ -38,12 +38,12 @@ reg signed [IN_MSB:0]ram_read_1 = 0;
 reg signed [IN_MSB:0]ram_read_2 = 0;
 reg signed [TAPS_MSB:0]rom_read = 0;
 
-reg signed [IN_MSB+TAPS_MSB:0]mult_1 = 0;
-reg signed [IN_MSB+TAPS_MSB:0]mult_2 = 0;
-reg signed [IN_MSB+TAPS_MSB+GAIN_BITS:0]acc_1 = 0;
-reg signed [IN_MSB+TAPS_MSB+GAIN_BITS:0]acc_2 = 0;
-reg signed [IN_MSB+TAPS_MSB+GAIN_BITS:0]round_1 = 0;
-reg signed [IN_MSB+TAPS_MSB+GAIN_BITS:0]round_2 = 0;
+reg signed [IN_MSB+TAPS_MSB-1:0]mult_1 = 0;
+reg signed [IN_MSB+TAPS_MSB-1:0]mult_2 = 0;
+reg signed [IN_MSB+TAPS_MSB+GAIN_BITS-1:0]acc_1 = 0;
+reg signed [IN_MSB+TAPS_MSB+GAIN_BITS-1:0]acc_2 = 0;
+reg signed [IN_MSB+TAPS_MSB+GAIN_BITS-1:0]round_1 = 0;
+reg signed [IN_MSB+TAPS_MSB+GAIN_BITS-1:0]round_2 = 0;
 
 reg [1:0]samp_clk_eg = 0;
 
@@ -110,10 +110,10 @@ begin
 
 	if(samp_clk_eg == 2'b01)													// Accumulator operation and output sample
 	begin
-		round_1 <= acc_1 + (1<<<(TAPS_MSB+GAIN_BITS-OUT_MSB-1));
-		round_2 <= acc_2 + (1<<<(TAPS_MSB+GAIN_BITS-OUT_MSB-1));
-		out_1[OUT_MSB:0] <= round_1[IN_MSB+TAPS_MSB+GAIN_BITS : IN_MSB+TAPS_MSB+GAIN_BITS-OUT_MSB];
-		out_2[OUT_MSB:0] <= round_2[IN_MSB+TAPS_MSB+GAIN_BITS : IN_MSB+TAPS_MSB+GAIN_BITS-OUT_MSB];
+		round_1 <= acc_1 + (1<<<(TAPS_MSB+GAIN_BITS-OUT_MSB-2));
+		round_2 <= acc_2 + (1<<<(TAPS_MSB+GAIN_BITS-OUT_MSB-2));
+		out_1[OUT_MSB:0] <= round_1[IN_MSB+TAPS_MSB+GAIN_BITS-1 : IN_MSB+TAPS_MSB+GAIN_BITS-OUT_MSB-1];
+		out_2[OUT_MSB:0] <= round_2[IN_MSB+TAPS_MSB+GAIN_BITS-1 : IN_MSB+TAPS_MSB+GAIN_BITS-OUT_MSB-1];
 	end
 
 	if(fsm_cnt == 1)

@@ -93,25 +93,28 @@ heterodyne inst_heterodyne
 
 // ##################### DOWNSAMPLER ###########################
 
+wire clk_220k;
+
 downsampler inst_downsampler
 (
     .het_I_in(het_I),
     .het_Q_in(het_Q),
     .clk_70M(clk_70M),
 
+    .clk_220k(),
     .clk_44k()
 );
 
 
 // ########################### SD DAC ##############################
 
-wire signed [21:0]test_wire;
+wire signed [23:0]test_wire;
 assign test_wire = inst_downsampler.fir_2_I_out;
 
 SD_DAC inst_test_dac
 (
     .DACout(probe),
-    .DACin(test_wire[15:0] + (1 << 15)),
+    .DACin({test_wire[13:0], 2'b00} + (1 << 15)),
     .Clk(clk_70M),
     .en(1)
 );
