@@ -21,9 +21,19 @@ module top
 );
 
 
+// ########################## MAIN CLOCK 70.56 MHz ##############################
 
-wire clk_70M;              // ########### MAIN CLOCK 70.56 MHz ###############
-assign clk_70M = adc_dry;
+wire clk_70M;              
+//assign clk_70M = adc_dry;
+
+reg [31:0]startup_delay;
+
+always @ (posedge clk_27M)
+begin
+    if(startup_delay < 27000000) startup_delay <= startup_delay + 1;
+end
+
+assign clk_70M = (startup_delay == 27000000)? adc_dry : 0;
 
 
 reg [7:0]s_meter_test;
@@ -95,8 +105,8 @@ downsampler inst_downsampler
 
 // ########################### SD DAC ##############################
 
-wire signed [19:0]test_wire;
-assign test_wire = inst_downsampler.fir_1_I_out;
+wire signed [21:0]test_wire;
+assign test_wire = inst_downsampler.fir_2_I_out;
 
 SD_DAC inst_test_dac
 (

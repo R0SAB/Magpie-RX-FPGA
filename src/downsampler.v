@@ -92,7 +92,7 @@ fir
 	.IN_MSB(17),
 	.OUT_MSB(19),
 	.TAPS_MSB(17),
-	.GAIN_BITS(4),
+	.GAIN_BITS(2),
 	.ROM_FILE("src/fir_coeffs/decim_fir1.txt"),
 	.SAMP_SKIP(0)
 )
@@ -106,6 +106,32 @@ inst_fir_1
 	.out_2(fir_1_Q_out)
 );
 
+
+
+// ########################## FIR 1 #############################
+
+wire signed [21:0]fir_2_I_out;
+wire signed [21:0]fir_2_Q_out;
+
+fir
+#(
+	.ORDER(300),
+	.IN_MSB(19),
+	.OUT_MSB(21),
+	.TAPS_MSB(19),
+	.GAIN_BITS(2),
+	.ROM_FILE("src/fir_coeffs/decim_fir2.txt"),
+	.SAMP_SKIP(0)
+)
+inst_fir_2
+(
+	.clk_H(clk_70M),
+	.samp_clk(clk_220k),
+	.in_1(fir_1_I_out),
+	.in_2(fir_1_Q_out),
+    .out_1(fir_2_I_out),
+	.out_2(fir_2_Q_out)
+);
 
 
 endmodule
