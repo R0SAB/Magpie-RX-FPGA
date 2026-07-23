@@ -46,15 +46,15 @@ end
 
 // ########################### CIC #############################
 
-wire signed [19:0]cic_I_out;
-wire signed [19:0]cic_Q_out;
+wire signed [17:0]cic_I_out;
+wire signed [17:0]cic_Q_out;
 
 CIC_decim
 #(
     .ORDER(3),
     .DELAY(160),
     .IN_MSB(15),
-    .OUT_MSB(19)
+    .OUT_MSB(17)
 )
 inst_cic_I
 ( 
@@ -70,7 +70,7 @@ CIC_decim
     .ORDER(3),
     .DELAY(160),
     .IN_MSB(15),
-    .OUT_MSB(19)
+    .OUT_MSB(17)
 )
 inst_cic_Q
 ( 
@@ -88,9 +88,9 @@ wire signed [21:0]fir_1_Q_out;
 fir
 #(
 	.ORDER(70),
-	.IN_MSB(19),
+	.IN_MSB(17),
 	.OUT_MSB(21),
-	.TAPS_MSB(23),
+	.TAPS_MSB(17),
 	.GAIN_BITS(4),
 	.ROM_FILE("src/fir_coeffs/decim_fir1.txt"),
 	.SAMP_SKIP(0)
