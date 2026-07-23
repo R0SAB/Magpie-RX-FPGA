@@ -1,7 +1,7 @@
 module downsampler
 (
-    input wire signed [14:0]het_I_in,
-    input wire signed [14:0]het_Q_in,
+    input wire signed [15:0]het_I_in,
+    input wire signed [15:0]het_Q_in,
     input wire clk_70M,
 
     output reg clk_882k,
@@ -53,7 +53,7 @@ CIC_decim
 #(
     .ORDER(3),
     .DELAY(160),
-    .IN_MSB(14),
+    .IN_MSB(15),
     .OUT_MSB(19)
 )
 inst_cic_I
@@ -69,7 +69,7 @@ CIC_decim
 #(
     .ORDER(3),
     .DELAY(160),
-    .IN_MSB(14),
+    .IN_MSB(15),
     .OUT_MSB(19)
 )
 inst_cic_Q

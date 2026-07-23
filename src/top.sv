@@ -77,8 +77,8 @@ spi_interface inst_spi
 
 // ############################ HETERODYNE ###########################
 
-wire [14:0]het_I;
-wire [14:0]het_Q;
+wire [15:0]het_I;
+wire [15:0]het_Q;
 
 heterodyne inst_heterodyne
 (

@@ -4,8 +4,8 @@ module heterodyne
     input wire [31:0]f0,
     input wire clk_70M,
 
-    output wire signed [14:0]I_out,
-    output wire signed [14:0]Q_out
+    output wire signed [15:0]I_out,
+    output wire signed [15:0]Q_out
 );
 
 reg [31:0]f0_reg;
@@ -38,12 +38,12 @@ cordic_pipeline_sincos              // CORDIC - both carrier generator and I/Q m
 #(
 .STAGES(16),                
 .PHASE_MSB(15),             
-.OUT_MSB(14)                
+.OUT_MSB(15)                
 )
 inst_cordic_f0
 (
 .phase_in(cordic_phase),                   
-.start_length({2'b00, adc_abs[12:0]}),               
+.start_length({adc_abs[13:0], 2'b00}),               
 .clk_H(clk_70M),
 .sin_out(Q_out),
 .cos_out(I_out)
