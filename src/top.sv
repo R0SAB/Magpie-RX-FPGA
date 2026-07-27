@@ -94,6 +94,7 @@ heterodyne inst_heterodyne
 // ##################### DOWNSAMPLER ###########################
 
 wire clk_220k;
+wire clk_44k;
 
 downsampler inst_downsampler
 (
@@ -102,21 +103,50 @@ downsampler inst_downsampler
     .clk_70M(clk_70M),
 
     .clk_220k(),
-    .clk_44k()
+    .clk_44k(clk_44k)
+);
+
+
+// ########################### TEST AM DEMOD ########################
+
+wire [16:0]am_demod_out;
+wire [15:0]downsamp_I;
+wire [15:0]downsamp_Q;
+
+assign downsamp_I = inst_downsampler.fir_2_I_out[15:0];
+assign downsamp_Q = inst_downsampler.fir_2_Q_out[15:0];
+
+cordic_fullser_angmag
+#(
+    .STAGES(16),                       
+    .ANG_MSB(15),                 
+    .IN_MSB(15)                   
+)
+inst_and_demod
+(
+    .sin_in(downsamp_Q),
+    .cos_in(downsamp_I),
+    .ang_out(),
+    .mag_out(am_demod_out),
+    .samp_clk(clk_44k),
+    .clk_H(clk_70M)
 );
 
 
 // ########################### SD DAC ##############################
 
-wire signed [23:0]test_wire;
-assign test_wire = inst_downsampler.fir_2_I_out;
+//wire signed [23:0]test_wire;
+//assign test_wire = inst_downsampler.fir_2_I_out;
 
 SD_DAC inst_test_dac
 (
     .DACout(probe),
-    .DACin({test_wire[13:0], 2'b00} + (1 << 15)),
+    .DACin(am_demod_out[15:0]),
     .Clk(clk_70M),
     .en(1)
 );
+
+
+
 
 endmodule
