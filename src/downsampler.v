@@ -82,14 +82,14 @@ inst_cic_Q
 
 // ########################## FIR 1 #############################
 
-wire signed [21:0]fir_1_I_out;
-wire signed [21:0]fir_1_Q_out;
+wire signed [17:0]fir_1_I_out;
+wire signed [17:0]fir_1_Q_out;
 
 fir
 #(
 	.ORDER(70),
 	.IN_MSB(17),
-	.OUT_MSB(21),
+	.OUT_MSB(17),
 	.TAPS_MSB(17),
 	.GAIN_BITS(4),
 	.ROM_FILE("src/fir_coeffs/decim_fir1.txt"),
@@ -115,9 +115,9 @@ wire signed [23:0]fir_2_Q_out;
 fir
 #(
 	.ORDER(300),
-	.IN_MSB(21),
+	.IN_MSB(17),
 	.OUT_MSB(23),
-	.TAPS_MSB(23),
+	.TAPS_MSB(17),
 	.GAIN_BITS(4),
 	.ROM_FILE("src/fir_coeffs/decim_fir2.txt"),
 	.SAMP_SKIP(0)
