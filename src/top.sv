@@ -93,33 +93,32 @@ heterodyne inst_heterodyne
 
 // ##################### DOWNSAMPLER ###########################
 
-wire clk_220k;
+wire clk_441k;
 wire clk_44k;
+wire [17:0]downsamp_I;
+wire [17:0]downsamp_Q;
 
 downsampler inst_downsampler
 (
     .het_I_in(het_I),
     .het_Q_in(het_Q),
-    .clk_70M(clk_70M),
+    .downsamp_I_out(downsamp_I),
+    .downsamp_Q_out(downsamp_Q),
 
+    .clk_70M(clk_70M),
     .clk_44k(clk_44k)
 );
 
 
 // ########################### TEST AM DEMOD ########################
 
-wire [23:0]am_demod_out;
-wire [23:0]downsamp_I;
-wire [23:0]downsamp_Q;
-
-assign downsamp_I = inst_downsampler.decim_I_out[23:0];
-assign downsamp_Q = inst_downsampler.decim_Q_out[23:0];
+wire [18:0]am_demod_out;
 
 cordic_fullser_angmag
 #(
-    .STAGES(24),                       
-    .ANG_MSB(23),                 
-    .IN_MSB(23)                   
+    .STAGES(18),                       
+    .ANG_MSB(17),                 
+    .IN_MSB(17)                   
 )
 inst_and_demod
 (
@@ -132,6 +131,35 @@ inst_and_demod
 );
 
 
+
+// ########################## FIR CLEANUP #############################
+
+
+wire [21:0]cleanup_out;
+
+
+fir
+#(
+	.ORDER(150),
+	.IN_MSB(17),
+	.OUT_MSB(21),
+	.TAPS_MSB(17),
+	.GAIN_BITS(2),
+	.ROM_FILE("src/fir_coeffs/fir_cleanup_5k.txt"),
+	.SAMP_SKIP(0)
+)
+inst_fir_bw
+(
+	.clk_H(clk_70M),
+	.samp_clk(clk_44k),
+	.in_1(am_demod_out[17:0] + 100),
+	.in_2(0),
+    .out_1(cleanup_out),
+	.out_2()
+);
+
+
+
 // ########################### SD DAC ##############################
 
 //wire signed [23:0]test_wire;
@@ -140,7 +168,7 @@ inst_and_demod
 SD_DAC inst_test_dac
 (
     .DACout(probe),
-    .DACin(am_demod_out[15:0]),
+    .DACin(cleanup_out[15:0]),
     .Clk(clk_70M),
     .en(1)
 );
