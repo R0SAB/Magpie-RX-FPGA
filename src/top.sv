@@ -102,7 +102,6 @@ downsampler inst_downsampler
     .het_Q_in(het_Q),
     .clk_70M(clk_70M),
 
-    .clk_220k(),
     .clk_44k(clk_44k)
 );
 
@@ -113,8 +112,8 @@ wire [23:0]am_demod_out;
 wire [23:0]downsamp_I;
 wire [23:0]downsamp_Q;
 
-assign downsamp_I = inst_downsampler.fir_2_I_out[23:0];
-assign downsamp_Q = inst_downsampler.fir_2_Q_out[23:0];
+assign downsamp_I = inst_downsampler.decim_I_out[23:0];
+assign downsamp_Q = inst_downsampler.decim_Q_out[23:0];
 
 cordic_fullser_angmag
 #(

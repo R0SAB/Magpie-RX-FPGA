@@ -21,6 +21,7 @@
         <File path="src/fir_coeffs/fir_0k3.txt" type="file.other" enable="1"/>
         <File path="src/fir_coeffs/fir_2k8.txt" type="file.other" enable="1"/>
         <File path="src/fir_coeffs/fir_4k8.txt" type="file.other" enable="1"/>
+        <File path="src/fir_coeffs/fir_decim.txt" type="file.other" enable="1"/>
         <File path="src/fir_coeffs/fir_hilbert.txt" type="file.other" enable="1"/>
     </FileList>
 </Project>
