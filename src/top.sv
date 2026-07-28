@@ -109,18 +109,18 @@ downsampler inst_downsampler
 
 // ########################### TEST AM DEMOD ########################
 
-wire [16:0]am_demod_out;
-wire [15:0]downsamp_I;
-wire [15:0]downsamp_Q;
+wire [23:0]am_demod_out;
+wire [23:0]downsamp_I;
+wire [23:0]downsamp_Q;
 
-assign downsamp_I = inst_downsampler.fir_2_I_out[15:0];
-assign downsamp_Q = inst_downsampler.fir_2_Q_out[15:0];
+assign downsamp_I = inst_downsampler.fir_2_I_out[23:0];
+assign downsamp_Q = inst_downsampler.fir_2_Q_out[23:0];
 
 cordic_fullser_angmag
 #(
-    .STAGES(16),                       
-    .ANG_MSB(15),                 
-    .IN_MSB(15)                   
+    .STAGES(24),                       
+    .ANG_MSB(23),                 
+    .IN_MSB(23)                   
 )
 inst_and_demod
 (
