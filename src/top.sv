@@ -52,6 +52,7 @@ end
 wire [31:0]f0;
 wire [1:0]modulation;
 wire [1:0]bandwidth;
+wire [5:0]volume_5bit;
 
 spi_interface inst_spi
 (
@@ -63,6 +64,7 @@ spi_interface inst_spi
     .f0_word_out(f0),
     .modulation_out(modulation),
     .bandwidth_out(bandwidth),
+    .volume_out(volume_5bit),
 
     .s_meter_value_in(s_meter_test)
 );
@@ -153,15 +155,26 @@ inst_fir_bw
 
 
 
-// ########################### SD DAC ##############################
+// ########################### VOLUME CONTROL AND SD DAC ##############################
 
 //wire signed [23:0]test_wire;
 //assign test_wire = inst_downsampler.fir_2_I_out;
 
+wire [15:0]volume_audio_out;
+
+volume_control inst_volume
+(
+    .volume_5bit_in(volume_5bit),
+    .audio_in(cleanup_out[15:0]),
+    .audio_out(volume_audio_out),
+    .clk_44k(clk_44k)
+);
+
+
 SD_DAC inst_test_dac
 (
     .DACout(sd_dac_out),
-    .DACin(cleanup_out[15:0]),
+    .DACin(volume_audio_out),
     .Clk(clk_70M),
     .en(1)
 );
