@@ -7,14 +7,7 @@ module top
 	output wire spi_miso,
 	input wire spi_cs,
 
-	output wire probe,
-
-    output wire led_1,
-    output wire led_2,
-    output wire led_3,
-    output wire led_4,
-    output wire led_5,
-    output wire led_6,
+	output wire sd_dac_out,
 
     input wire signed [13:0]adc_in,
     input wire adc_dry
@@ -167,7 +160,7 @@ inst_fir_bw
 
 SD_DAC inst_test_dac
 (
-    .DACout(probe),
+    .DACout(sd_dac_out),
     .DACin(cleanup_out[15:0]),
     .Clk(clk_70M),
     .en(1)
