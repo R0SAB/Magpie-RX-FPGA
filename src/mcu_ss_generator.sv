@@ -30,7 +30,7 @@ begin
     if(dir == 1) f_sweep <= f_sweep + 1;
     else f_sweep <= f_sweep - 1;
     
-    f <= f0 + (f_sweep >> 2);
+    f <= f0 + (f_sweep);
     ph_acc <= ph_acc + f;
     ss_clk_out <= ph_acc[19];
 
