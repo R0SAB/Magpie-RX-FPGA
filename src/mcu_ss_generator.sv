@@ -4,7 +4,7 @@ module mcu_ss_generator
     output reg ss_clk_out       // 8 MHz + 1/32
 );
 
-reg [12:0]f_sweep;      // 125 MHz/2^11 = 15.25 kHz
+reg [12:0]f_sweep;      // 125 MHz/2^13 = 15.25 kHz
 wire [19:0]f0;
 assign f0 = 20'd72000;  // 2^20/125M*8M
 reg [19:0]ph_acc;       // ~32x f_sweep
@@ -30,7 +30,7 @@ begin
     if(dir == 1) f_sweep <= f_sweep + 1;
     else f_sweep <= f_sweep - 1;
     
-    f <= f0 + (f_sweep);
+    f <= f0 + (f_sweep >> 2);
     ph_acc <= ph_acc + f;
     ss_clk_out <= ph_acc[19];
 
