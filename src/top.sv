@@ -188,14 +188,15 @@ SD_DAC inst_test_dac
 
 wire ss_clk_H;
 
-gowin_osc inst_osc      // 125 MHz
+Gowin_rPLL inst_ss_pll          // 199.8 MHz
 (
-    .oscout(ss_clk_H)
+        .clkout(ss_clk_H),
+        .clkin(clk_27M)
 );
 
 mcu_ss_generator inst_mcu_ss
 (
-    .clk_H(ss_clk_H),           // 125 MHz
+    .clk_H(ss_clk_H),           // 199.8 MHz
     .ss_clk_out(mcu_ss_clk)       // 8 MHz + 1/32
 );
 

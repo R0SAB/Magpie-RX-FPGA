@@ -12,6 +12,7 @@
         <File path="src/downsampler.v" type="file.verilog" enable="1"/>
         <File path="src/fir.v" type="file.verilog" enable="1"/>
         <File path="src/gowin_osc/gowin_osc.v" type="file.verilog" enable="1"/>
+        <File path="src/gowin_rpll/gowin_rpll.v" type="file.verilog" enable="1"/>
         <File path="src/gowin_rpll/test_rpll.v" type="file.verilog" enable="1"/>
         <File path="src/heterodyne.sv" type="file.verilog" enable="1"/>
         <File path="src/mcu_ss_generator.sv" type="file.verilog" enable="1"/>
