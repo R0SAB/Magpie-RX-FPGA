@@ -92,8 +92,8 @@ heterodyne inst_heterodyne
 
 wire clk_441k;
 wire clk_44k;
-wire [17:0]downsamp_I;
-wire [17:0]downsamp_Q;
+wire [23:0]downsamp_I;
+wire [23:0]downsamp_Q;
 
 downsampler inst_downsampler
 (
@@ -109,13 +109,13 @@ downsampler inst_downsampler
 
 // ########################### TEST AM DEMOD ########################
 
-wire [18:0]am_demod_out;
+wire [24:0]am_demod_out;
 
 cordic_fullser_angmag
 #(
-    .STAGES(18),                       
-    .ANG_MSB(17),                 
-    .IN_MSB(17)                   
+    .STAGES(24),                       
+    .ANG_MSB(23),                 
+    .IN_MSB(23)                   
 )
 inst_and_demod
 (
@@ -132,15 +132,15 @@ inst_and_demod
 // ########################## FIR CLEANUP #############################
 
 
-wire [21:0]cleanup_out;
+wire [23:0]cleanup_out;
 
 
 fir
 #(
 	.ORDER(150),
-	.IN_MSB(17),
-	.OUT_MSB(21),
-	.TAPS_MSB(17),
+	.IN_MSB(23),
+	.OUT_MSB(23),
+	.TAPS_MSB(23),
 	.GAIN_BITS(2),
 	.ROM_FILE("src/fir_coeffs/fir_cleanup_5k.txt"),
 	.SAMP_SKIP(0)
@@ -149,7 +149,7 @@ inst_fir_bw
 (
 	.clk_H(clk_70M),
 	.samp_clk(clk_44k),
-	.in_1(am_demod_out[17:0] + 100),
+	.in_1(am_demod_out[23:0] + 1000),
 	.in_2(0),
     .out_1(cleanup_out),
 	.out_2()
@@ -162,12 +162,21 @@ inst_fir_bw
 //wire signed [23:0]test_wire;
 //assign test_wire = inst_downsampler.fir_2_I_out;
 
+reg [15:0]clamp;
+
+always @ (posedge clk_44k)
+begin
+    if(cleanup_out < 32767) clamp <= cleanup_out[15:0];
+    else clamp <= 32767;
+end
+
+
 wire [15:0]volume_audio_out;
 
 volume_control inst_volume
 (
     .volume_5bit_in(volume_5bit),
-    .audio_in(cleanup_out[15:0]),
+    .audio_in(clamp),
     .audio_out(volume_audio_out),
     .clk_44k(clk_44k)
 );
