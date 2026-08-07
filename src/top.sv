@@ -10,7 +10,9 @@ module top
 	output wire sd_dac_out,
 
     input wire signed [13:0]adc_in,
-    input wire adc_dry
+    input wire adc_dry,
+
+    output wire mcu_ss_clk
 );
 
 
@@ -179,6 +181,23 @@ SD_DAC inst_test_dac
     .en(1)
 );
 
+
+
+
+// ############################# MCU SS CLOCK ###############################
+
+wire ss_clk_H;
+
+gowin_osc inst_osc      // 125 MHz
+(
+    .oscout(ss_clk_H)
+);
+
+mcu_ss_generator inst_mcu_ss
+(
+    .clk_H(ss_clk_H),           // 125 MHz
+    .ss_clk_out(mcu_ss_clk)       // 8 MHz + 1/32
+);
 
 
 

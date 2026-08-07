@@ -1,0 +1,17 @@
+[General]
+ipc_version=4
+file=gowin_osc
+module=gowin_osc
+target_device=gw2a18c-011
+type=clock_osc
+version=3.0
+
+[Config]
+Enable_OSC_Ref=false
+Enable_Trim=true
+Enable_mDRP=false
+FREQ=2
+LANG=0
+OSCILLATOR_FREQUENCY_210MHz=false
+OSCILLATOR_FREQUENCY_25MHz=false
+REGULATOR_ENABLE=false
