@@ -156,6 +156,18 @@ inst_fir_bw
 );
 
 
+// ################################ AGC ####################################
+
+wire signed [23:0]agc_out;
+
+agc inst_agc
+(
+    .audio_in(cleanup_out),
+    .audio_out(agc_out),
+    .clk_44k(clk_44k),
+    .clk_70M(clk_70M)
+);
+
 
 // ########################### VOLUME CONTROL AND SD DAC ##############################
 
@@ -166,7 +178,7 @@ reg [15:0]clamp;
 
 always @ (posedge clk_44k)
 begin
-    if(cleanup_out < 32767) clamp <= cleanup_out[15:0];
+    if(agc_out < 32767) clamp <= agc_out[15:0];
     else clamp <= 32767;
 end
 
