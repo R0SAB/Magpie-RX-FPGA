@@ -12,11 +12,11 @@ reg signed [23:0]detector;
 wire [23:0]target;
 assign target = 5000;
 
-reg signed [33:0]itgr;
+reg signed [30:0]itgr;
 wire signed [15:0]itgr_output;
-assign itgr_output[15:0] = itgr[33:18];
+assign itgr_output[15:0] = itgr[30:15];
 
-reg signed [31:0]multiplier;
+reg signed [35:0]multiplier;
 
 
 always @ (posedge clk_70M)
@@ -32,7 +32,7 @@ begin
 
         itgr <= itgr + target - detector;
         multiplier <= itgr_output * audio_in;
-        audio_out[23:0] <= multiplier[31:8];
+        audio_out[23:0] <= multiplier[35:12];
 
     end
 

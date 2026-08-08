@@ -17,7 +17,7 @@ parameter OUT_MSB = 20
 input wire signed [IN_MSB:0]in,  
 input wire samp_clk_L,
 input wire samp_clk_H,				 
-output wire [OUT_MSB:0]out 
+output reg [OUT_MSB:0]out 
 );
 
 
@@ -44,12 +44,11 @@ end
 
 reg signed [IN_MSB+GAIN_BITS:0]buffer = 0;
 reg signed [IN_MSB+GAIN_BITS:0]sum = 0;
-    
-assign out[OUT_MSB:0] = sum[IN_MSB+GAIN_BITS:IN_MSB+GAIN_BITS-OUT_MSB];
 
-always @ *
+always @ (posedge samp_clk_H)
 begin
-sum <= buffer + (1<<<(IN_MSB+GAIN_BITS-OUT_MSB-1));
+    sum <= buffer + (1<<<(IN_MSB+GAIN_BITS-OUT_MSB-1));
+    out[OUT_MSB:0] = sum[IN_MSB+GAIN_BITS:IN_MSB+GAIN_BITS-OUT_MSB];
 end
 
 reg [1:0]samp_clk_L_eg = 2'd0;
