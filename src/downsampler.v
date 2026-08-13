@@ -2,6 +2,7 @@ module downsampler
 (
     input wire signed [15:0]het_I_in,
     input wire signed [15:0]het_Q_in,
+    input wire [1:0]bw_in,
     input wire clk_70M,
 
     output wire [23:0]downsamp_I_out,
@@ -99,14 +100,16 @@ inst_fir_1
 // ########################## FIR BW #############################
 
 
-fir
+fir_3roms
 #(
 	.ORDER(1022),
 	.IN_MSB(17),
 	.OUT_MSB(23),
 	.TAPS_MSB(23),
 	.GAIN_BITS(2),
-	.ROM_FILE("src/fir_coeffs/fir_4k8.txt"),
+	.ROM_FILE_0("src/fir_coeffs/fir_4k8.txt"),
+    .ROM_FILE_1("src/fir_coeffs/fir_2k8.txt"),
+    .ROM_FILE_2("src/fir_coeffs/fir_0k3.txt"),
 	.SAMP_SKIP(0)
 )
 inst_fir_bw
@@ -116,7 +119,8 @@ inst_fir_bw
 	.in_1(fir_decim_I_out),
 	.in_2(fir_decim_Q_out),
     .out_1(downsamp_I_out),
-	.out_2(downsamp_Q_out)
+	.out_2(downsamp_Q_out),
+    .bw_in(bw_in)
 );
 
 

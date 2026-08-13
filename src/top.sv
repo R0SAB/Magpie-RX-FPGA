@@ -101,7 +101,7 @@ downsampler inst_downsampler
     .het_Q_in(het_Q),
     .downsamp_I_out(downsamp_I),
     .downsamp_Q_out(downsamp_Q),
-
+    .bw_in(bandwidth),
     .clk_70M(clk_70M),
     .clk_44k(clk_44k)
 );

@@ -4,7 +4,7 @@ module mcu_ss_generator
     output reg ss_clk_out       // 8 MHz + 1/32
 );
 
-reg [9:0]f_sweep;      // 199.8 MHz/2^15 = 6.1 kHz
+reg [8:0]f_sweep;      // 199.8 MHz/2^15 = 6.1 kHz
 wire [19:0]f0;
 assign f0 = 20'd42000;  // 2^20/125M*8M
 reg [19:0]ph_acc;       // ~32x f_sweep
