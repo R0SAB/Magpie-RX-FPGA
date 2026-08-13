@@ -10,6 +10,7 @@
         <File path="src/agc.sv" type="file.verilog" enable="1"/>
         <File path="src/cordic_fullser_angmag.v" type="file.verilog" enable="1"/>
         <File path="src/cordic_pipeline_sincos.v" type="file.verilog" enable="1"/>
+        <File path="src/dc_remover.sv" type="file.verilog" enable="1"/>
         <File path="src/downsampler.v" type="file.verilog" enable="1"/>
         <File path="src/fir.v" type="file.verilog" enable="1"/>
         <File path="src/fir_3roms.v" type="file.verilog" enable="1"/>

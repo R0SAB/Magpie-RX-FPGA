@@ -107,7 +107,7 @@ downsampler inst_downsampler
 );
 
 
-// ########################### TEST AM DEMOD ########################
+// ########################### AM DEMOD ################################
 
 wire [24:0]am_demod_out;
 
@@ -146,11 +146,11 @@ fir_3roms
     .ROM_FILE_1("src/fir_coeffs/fir_cleanup_3k.txt"),
 	.SAMP_SKIP(0)
 )
-inst_fir_bw
+inst_fir_cleanup
 (
 	.clk_H(clk_70M),
 	.samp_clk(clk_44k),
-	.in_1(am_demod_out[23:0] + 1000),
+	.in_1(am_demod_out[23:0]),
 	.in_2(0),
     .out_1(cleanup_out),
 	.out_2(),
@@ -171,35 +171,51 @@ agc inst_agc
 );
 
 
+// ############################ DC REMOVER #################################
+
+wire [23:0]dc_remover_out;
+
+dc_remover inst_dc_remover
+(
+    .in(agc_out),
+    .out(dc_remover_out),
+    .clk_44k(clk_44k)
+);
+
+
+
 // ########################### VOLUME CONTROL AND SD DAC ##############################
 
-//wire signed [23:0]test_wire;
-//assign test_wire = inst_downsampler.fir_2_I_out;
 
-reg [15:0]clamp;
+wire signed [23:0]clamp_in;
+reg signed [15:0]clamp_out;
+
+assign clamp_in = dc_remover_out;
 
 always @ (posedge clk_44k)
 begin
-    if(agc_out < 32767) clamp <= agc_out[15:0];
-    else clamp <= 32767;
+    if(clamp_in > 32767) clamp_out <= 32767;
+    else
+    if(clamp_in < -32768) clamp_out  <= -32768;
+    else clamp_out <= clamp_in[15:0];
 end
 
 
-wire [15:0]volume_audio_out;
+wire signed [15:0]volume_audio_out;
 
 volume_control inst_volume
 (
     .volume_5bit_in(volume_5bit),
-    .audio_in(clamp),
+    .audio_in(clamp_out),
     .audio_out(volume_audio_out),
     .clk_44k(clk_44k)
 );
 
 
-SD_DAC inst_test_dac
+SD_DAC inst_audio_dac
 (
     .DACout(sd_dac_out),
-    .DACin(volume_audio_out),
+    .DACin(volume_audio_out + 16'd32768),
     .Clk(clk_70M),
     .en(1)
 );
