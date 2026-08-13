@@ -23,12 +23,12 @@
         <File path="src/volume_control.v" type="file.verilog" enable="1"/>
         <File path="src/Magpie_RX.cst" type="file.cst" enable="1"/>
         <File path="src/Magpie-RX-FPGA.sdc" type="file.sdc" enable="1"/>
-        <File path="src/fir_coeffs/decim_fir1.txt" type="file.other" enable="1"/>
-        <File path="src/fir_coeffs/decim_fir2.txt" type="file.other" enable="1"/>
         <File path="src/fir_coeffs/fir_0k3.txt" type="file.other" enable="1"/>
         <File path="src/fir_coeffs/fir_2k8.txt" type="file.other" enable="1"/>
         <File path="src/fir_coeffs/fir_4k8.txt" type="file.other" enable="1"/>
+        <File path="src/fir_coeffs/fir_cleanup_3k.txt" type="file.other" enable="1"/>
         <File path="src/fir_coeffs/fir_cleanup_5k.txt" type="file.other" enable="1"/>
+        <File path="src/fir_coeffs/fir_decim.txt" type="file.other" enable="1"/>
         <File path="src/fir_coeffs/fir_hilbert.txt" type="file.other" enable="1"/>
     </FileList>
 </Project>

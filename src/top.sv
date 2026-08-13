@@ -135,14 +135,15 @@ inst_and_demod
 wire [23:0]cleanup_out;
 
 
-fir
+fir_3roms
 #(
 	.ORDER(150),
 	.IN_MSB(23),
 	.OUT_MSB(23),
 	.TAPS_MSB(23),
 	.GAIN_BITS(2),
-	.ROM_FILE("src/fir_coeffs/fir_cleanup_5k.txt"),
+	.ROM_FILE_0("src/fir_coeffs/fir_cleanup_5k.txt"),
+    .ROM_FILE_1("src/fir_coeffs/fir_cleanup_3k.txt"),
 	.SAMP_SKIP(0)
 )
 inst_fir_bw
@@ -152,7 +153,8 @@ inst_fir_bw
 	.in_1(am_demod_out[23:0] + 1000),
 	.in_2(0),
     .out_1(cleanup_out),
-	.out_2()
+	.out_2(),
+    .bw_in((bandwidth == 2'd0) ? 2'd0 : 2'd1)
 );
 
 
