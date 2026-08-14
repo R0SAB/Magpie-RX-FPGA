@@ -191,7 +191,8 @@ agc inst_agc
     .audio_in(cleanup_out),
     .audio_out(agc_out),
     .clk_44k(clk_44k),
-    .clk_70M(clk_70M)
+    .clk_70M(clk_70M),
+    .mode((modulation == 2'd2) ? 1 : 0)
 );
 
 
