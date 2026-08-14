@@ -237,7 +237,7 @@ volume_control inst_volume
 sd_dac_my inst_audio_dac
 (
     .clk(clk_70M),
-    .in(volume_audio_out - 1000),
+    .in(volume_audio_out - 1001),
     .out(sd_dac_out)
 );
 
