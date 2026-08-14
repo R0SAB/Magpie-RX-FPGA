@@ -20,6 +20,7 @@
         <File path="src/heterodyne.sv" type="file.verilog" enable="1"/>
         <File path="src/mcu_ss_generator.sv" type="file.verilog" enable="1"/>
         <File path="src/sd_dac_chatgpt.sv" type="file.verilog" enable="1"/>
+        <File path="src/sd_dac_my.sv" type="file.verilog" enable="1"/>
         <File path="src/spi_interface.sv" type="file.verilog" enable="1"/>
         <File path="src/ssb_demod.sv" type="file.verilog" enable="1"/>
         <File path="src/top.sv" type="file.verilog" enable="1"/>

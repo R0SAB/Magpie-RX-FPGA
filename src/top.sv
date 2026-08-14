@@ -234,10 +234,10 @@ volume_control inst_volume
     .clk_44k(clk_44k)
 );
 
-sd_dac_chatgpt inst_audio_dac
+sd_dac_my inst_audio_dac
 (
     .clk(clk_70M),
-    .in(volume_audio_out),
+    .in(volume_audio_out - 1000),
     .out(sd_dac_out)
 );
 
