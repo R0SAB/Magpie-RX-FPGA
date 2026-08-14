@@ -34,6 +34,8 @@ begin
         multiplier <= itgr_output * audio_in;
         audio_out[23:0] <= multiplier[35:12];
 
+        if(itgr > (1 <<< 28)) itgr <= (1 <<< 28);
+
     end
 
 end
