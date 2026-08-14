@@ -55,6 +55,7 @@ wire [31:0]f0;
 wire [1:0]modulation;
 wire [1:0]bandwidth;
 wire [5:0]volume_5bit;
+wire [7:0]s_meter_value;
 
 spi_interface inst_spi
 (
@@ -68,7 +69,7 @@ spi_interface inst_spi
     .bandwidth_out(bandwidth),
     .volume_out(volume_5bit),
 
-    .s_meter_value_in(s_meter_test)
+    .s_meter_value_in(s_meter_value)
 );
 
 
@@ -192,7 +193,8 @@ agc inst_agc
     .audio_out(agc_out),
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),
-    .mode((modulation == 2'd2) ? 1 : 0)
+    .mode((modulation == 2'd2) ? 1 : 0),
+    .s_meter_out(s_meter_value)
 );
 
 
