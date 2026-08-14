@@ -63,6 +63,8 @@ begin
 
     end
 
+    if(itgr_s > (1<<<(15+12+S_SHIFT+1))) itgr_s <= (1<<<(15+12+S_SHIFT+1));
+
     casex(s_mask)
         16'b0000000000000001: s_meter_out <= 0;
         16'b000000000000001x: s_meter_out <= 1;
