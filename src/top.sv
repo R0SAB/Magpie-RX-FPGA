@@ -108,26 +108,6 @@ downsampler inst_downsampler
 );
 
 
-// ########################### I/Q DC REMOVE ################################
-
-wire [23:0]dcless_I;
-wire [23:0]dcless_Q;
-
-dc_remover inst_dcless_I
-(
-    .in(downsamp_I),
-    .out(dcless_I),
-    .clk_44k(clk_44k)
-);
-
-dc_remover inst_dcless_Q
-(
-    .in(downsamp_Q),
-    .out(dcless_Q),
-    .clk_44k(clk_44k)
-);
-
-
 // ########################### AM DEMOD ################################
 
 wire [24:0]am_demod_out;
@@ -140,8 +120,8 @@ cordic_fullser_angmag
 )
 inst_and_demod
 (
-    .sin_in(dcless_Q),
-    .cos_in(dcless_I),
+    .sin_in(downsamp_I + 45),
+    .cos_in(downsamp_Q + 45),
     .ang_out(),
     .mag_out(am_demod_out),
     .samp_clk(clk_44k),

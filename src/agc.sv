@@ -13,8 +13,8 @@ reg [1:0]clk_44k_eg;
 
 reg signed [23:0]detector;
 reg signed [23:0]detector_qpeak;
-wire [23:0]target;
-assign target = 5000;
+wire signed [23:0]target;
+assign target = (mode) ? 7000 : 5000;
 
 reg signed [30:0]itgr;
 wire signed [15:0]itgr_output;
@@ -45,7 +45,7 @@ begin
         multiplier <= itgr_output * audio_in;
         audio_out[23:0] <= multiplier[35:12];
 
-        if(itgr > (1 <<< 28)) itgr <= (1 <<< 28);
+        if(itgr > ('b11 <<< 27)) itgr <= ('b11 <<< 27);
 
 
     end
