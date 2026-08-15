@@ -171,7 +171,7 @@ reg [23:0]mod_switch_out;
 
 always @ (posedge clk_44k)
 begin
-    if(modulation == 2) mod_switch_out <= (am_demod_out >>> 1);
+    if(modulation == 2) mod_switch_out <= (am_demod_out >>> 1) - 110;
     else mod_switch_out <= ssb_demod_out;
 end
 
