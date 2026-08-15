@@ -108,6 +108,26 @@ downsampler inst_downsampler
 );
 
 
+// ########################### I/Q DC REMOVE ################################
+
+wire [23:0]dcless_I;
+wire [23:0]dcless_Q;
+
+dc_remover inst_dcless_I
+(
+    .in(downsamp_I),
+    .out(dcless_I),
+    .clk_44k(clk_44k)
+);
+
+dc_remover inst_dcless_Q
+(
+    .in(downsamp_Q),
+    .out(dcless_Q),
+    .clk_44k(clk_44k)
+);
+
+
 // ########################### AM DEMOD ################################
 
 wire [24:0]am_demod_out;
@@ -120,13 +140,14 @@ cordic_fullser_angmag
 )
 inst_and_demod
 (
-    .sin_in(downsamp_Q),
-    .cos_in(downsamp_I),
+    .sin_in(dcless_Q),
+    .cos_in(dcless_I),
     .ang_out(),
     .mag_out(am_demod_out),
     .samp_clk(clk_44k),
     .clk_H(clk_70M)
 );
+
 
 // ######################### SSB DEMOD #############################
 
@@ -150,7 +171,7 @@ reg [23:0]mod_switch_out;
 
 always @ (posedge clk_44k)
 begin
-    if(modulation == 2) mod_switch_out <= am_demod_out;
+    if(modulation == 2) mod_switch_out <= (am_demod_out >>> 1);
     else mod_switch_out <= ssb_demod_out;
 end
 
@@ -183,7 +204,14 @@ inst_fir_cleanup
 );
 
 
-// ################################ AGC ####################################
+// ################################ S-METER AND AGC ####################################
+
+s_meter inst_s_meter
+(
+    .amplitude_in(cleanup_out),
+    .s_meter_out(s_meter_value),
+    .clk_44k(clk_44k)
+);
 
 wire signed [23:0]agc_out;
 
@@ -193,12 +221,11 @@ agc inst_agc
     .audio_out(agc_out),
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),
-    .mode((modulation == 2'd2) ? 1 : 0),
-    .s_meter_out(s_meter_value)
+    .mode((modulation == 2'd2) ? 1 : 0)
 );
 
 
-// ############################ DC REMOVER #################################
+// ############################ AUDIO DC REMOVER #################################
 
 wire [23:0]dc_remover_out;
 
