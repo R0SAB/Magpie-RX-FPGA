@@ -8,7 +8,7 @@ module ovr_s_meter_mux
 
 reg signed [13:0]adc_fifo[0:1];
 wire ovr;
-assign ovr = ((adc_fifo[1] == adc_fifo[0]) && (adc_fifo[0] == 14'd8191 || adc_fifo[0] == -14'd8192));
+assign ovr = (/*(adc_fifo[1] == adc_fifo[0]) && */(adc_fifo[0] == 14'd8191 || adc_fifo[0] == -14'd8192));
 
 reg [23:0]ovr_delay;
 
