@@ -1,4 +1,4 @@
-module heterodyne
+module lo_mixer
 (
     input wire signed [13:0]adc_in,
     input wire [31:0]f0,

@@ -87,12 +87,12 @@ ovr_s_meter_mux inst_s_meter_mux
 
 
 
-// ############################ HETERODYNE ###########################
+// ############################ LO ###########################
 
 wire [15:0]het_I;
 wire [15:0]het_Q;
 
-heterodyne inst_heterodyne
+lo_mixer inst_lo
 (
     .adc_in(adc_in),
     .f0(f0),
