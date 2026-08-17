@@ -42,7 +42,7 @@ begin
         16'b001xxxxxxxxxxxxx: s_meter_out <= 13;
         16'b01xxxxxxxxxxxxxx: s_meter_out <= 14;
         16'b1xxxxxxxxxxxxxxx: s_meter_out <= 15;
-        default: s_meter_out <= 15;
+        default: s_meter_out <= 0;
     endcase
 
 end

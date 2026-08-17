@@ -19,6 +19,7 @@
         <File path="src/gowin_rpll/test_rpll.v" type="file.verilog" enable="1"/>
         <File path="src/heterodyne.sv" type="file.verilog" enable="1"/>
         <File path="src/mcu_ss_generator.sv" type="file.verilog" enable="1"/>
+        <File path="src/ovr_s_meter_mux.sv" type="file.verilog" enable="1"/>
         <File path="src/s_meter.sv" type="file.verilog" enable="1"/>
         <File path="src/sd_dac_chatgpt.sv" type="file.verilog" enable="1"/>
         <File path="src/sd_dac_my.sv" type="file.verilog" enable="1"/>

@@ -55,7 +55,7 @@ wire [31:0]f0;
 wire [1:0]modulation;
 wire [1:0]bandwidth;
 wire [5:0]volume_5bit;
-wire [7:0]s_meter_value;
+wire [7:0]s_meter_spi;
 
 spi_interface inst_spi
 (
@@ -69,8 +69,22 @@ spi_interface inst_spi
     .bandwidth_out(bandwidth),
     .volume_out(volume_5bit),
 
-    .s_meter_value_in(s_meter_value)
+    .s_meter_value_in(s_meter_spi)
 );
+
+
+// ############################# OVR DETECTOR AND S-METER DELAY ##############################
+
+wire [7:0]s_meter_value;
+
+ovr_s_meter_mux inst_s_meter_mux
+(
+    .adc_in(adc_in),
+    .s_meter_in(s_meter_value),
+    .s_meter_out(s_meter_spi),
+    .clk_70M(clk_70M)
+);
+
 
 
 // ############################ HETERODYNE ###########################
