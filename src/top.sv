@@ -73,7 +73,7 @@ spi_interface inst_spi
 );
 
 
-// ############################# OVR DETECTOR AND S-METER DELAY ##############################
+// ############################# OVR DETECTOR AND S-METER MUX ##############################
 
 wire [7:0]s_meter_value;
 
