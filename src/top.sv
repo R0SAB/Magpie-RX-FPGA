@@ -125,6 +125,7 @@ downsampler inst_downsampler
 // ########################### AM DEMOD ################################
 
 wire [24:0]am_demod_out;
+wire signed [23:0]baseband_phase;
 
 cordic_fullser_angmag
 #(
@@ -136,10 +137,27 @@ inst_and_demod
 (
     .sin_in(downsamp_I + 45),
     .cos_in(downsamp_Q + 45),
-    .ang_out(),
+    .ang_out(baseband_phase),
     .mag_out(am_demod_out),
     .samp_clk(clk_44k),
     .clk_H(clk_70M)
+);
+
+
+// ####################### SYNC CARRIER GEN ######################
+
+
+wire signed [23:0]sync_car_cos;
+wire signed [23:0]sync_car_sin;
+
+
+lo_sync inst_lo_sync
+(
+    .phase_ref(baseband_phase),
+    .clk_44k(clk_44k),
+    .clk_70M(clk_70M),
+    .sync_car_cos(sync_car_cos),
+    .sync_car_sin(sync_car_sin)    
 );
 
 
@@ -172,7 +190,7 @@ end
 // ########################## FIR CLEANUP #############################
 
 
-wire [23:0]cleanup_out;
+wire signed [23:0]cleanup_out;
 
 
 fir_3roms
@@ -211,7 +229,7 @@ wire signed [23:0]agc_out;
 
 agc inst_agc
 (
-    .audio_in(cleanup_out),
+    .audio_in(cleanup_out + (sync_car_cos >>> 10)),
     .audio_out(agc_out),
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),
