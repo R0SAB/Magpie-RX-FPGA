@@ -31,22 +31,6 @@ end
 assign clk_70M = (startup_delay == 27000000)? adc_dry : 0;
 
 
-reg [7:0]s_meter_test;
-reg [31:0]div;
-
-always @ (posedge clk_27M)
-begin
-    if(div < 8000000) div <= div + 1;
-    else
-    begin
-        div <= 0;
-
-        if(s_meter_test < 15) s_meter_test <= s_meter_test + 1;
-        else s_meter_test <= 0;
-    end
-end
-
-
 
 
 // ######################### SPI INTERFACE ###########################
@@ -107,8 +91,8 @@ lo_mixer inst_lo
 
 wire clk_441k;
 wire clk_44k;
-wire [23:0]downsamp_I;
-wire [23:0]downsamp_Q;
+wire [17:0]downsamp_I;
+wire [17:0]downsamp_Q;
 
 downsampler inst_downsampler
 (
@@ -116,9 +100,55 @@ downsampler inst_downsampler
     .het_Q_in(het_Q),
     .downsamp_I_out(downsamp_I),
     .downsamp_Q_out(downsamp_Q),
-    .bw_in(bandwidth),
     .clk_70M(clk_70M),
     .clk_44k(clk_44k)
+);
+
+
+// ####################### SYNC CARRIER GEN ######################
+
+
+wire signed [23:0]sync_car_cos;
+wire signed [23:0]sync_car_sin;
+
+
+lo_sync inst_lo_sync
+(
+    .in_I(downsamp_I),
+    .in_Q(downsamp_Q),
+    .clk_44k(clk_44k),
+    .clk_70M(clk_70M),
+    .sync_car_cos(sync_car_cos),
+    .sync_car_sin(sync_car_sin)    
+);
+
+
+// ########################### FIR BW ##############################
+
+wire signed [23:0]bw_I_out;
+wire signed [23:0]bw_Q_out;
+
+fir_3roms
+#(
+	.ORDER(1022),
+	.IN_MSB(17),
+	.OUT_MSB(23),
+	.TAPS_MSB(23),
+	.GAIN_BITS(2),
+	.ROM_FILE_0("src/fir_coeffs/fir_4k8.txt"),
+    .ROM_FILE_1("src/fir_coeffs/fir_2k8.txt"),
+    .ROM_FILE_2("src/fir_coeffs/fir_0k3.txt"),
+	.SAMP_SKIP(0)
+)
+inst_fir_bw
+(
+	.clk_H(clk_70M),
+	.samp_clk(clk_44k),
+	.in_1(downsamp_I),
+	.in_2(downsamp_Q),
+    .out_1(bw_I_out),
+	.out_2(bw_Q_out),
+    .bw_in(bw_in)
 );
 
 
@@ -135,29 +165,12 @@ cordic_fullser_angmag
 )
 inst_and_demod
 (
-    .sin_in(downsamp_I + 45),
-    .cos_in(downsamp_Q + 45),
+    .sin_in(bw_I_out + 45),
+    .cos_in(bw_Q_out + 45),
     .ang_out(baseband_phase),
     .mag_out(am_demod_out),
     .samp_clk(clk_44k),
     .clk_H(clk_70M)
-);
-
-
-// ####################### SYNC CARRIER GEN ######################
-
-
-wire signed [23:0]sync_car_cos;
-wire signed [23:0]sync_car_sin;
-
-
-lo_sync inst_lo_sync
-(
-    .phase_ref(baseband_phase),
-    .clk_44k(clk_44k),
-    .clk_70M(clk_70M),
-    .sync_car_cos(sync_car_cos),
-    .sync_car_sin(sync_car_sin)    
 );
 
 
@@ -167,8 +180,8 @@ wire [23:0]ssb_demod_out;
 
 ssb_demod inst_ssb_demod
 (
-    .in_I(downsamp_I),
-    .in_Q(downsamp_Q),
+    .in_I(bw_I_out),
+    .in_Q(bw_Q_out),
     .ssb_out(ssb_demod_out),
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),

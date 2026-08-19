@@ -1,6 +1,7 @@
 module lo_sync
 (
-    input wire signed [23:0]phase_ref,
+    input wire signed [17:0]in_I,
+    input wire signed [17:0]in_Q,
     input wire clk_44k,
     input wire clk_70M,
     output wire signed [23:0]sync_car_cos,
@@ -10,6 +11,47 @@ module lo_sync
 
 localparam FREQ_TAU_BITS = 14;
 localparam PHASE_INJECT_BITS = 3;
+
+wire signed [23:0]narrow_I;
+wire signed [23:0]narrow_Q;
+wire signed [23:0]phase_ref;
+
+fir
+#(
+	.ORDER(510),
+	.IN_MSB(17),
+	.OUT_MSB(23),
+	.TAPS_MSB(23),
+	.GAIN_BITS(6),
+	.ROM_FILE("src/fir_coeffs/fir_0k2_lpf_511.txt"),
+	.SAMP_SKIP(0)
+)
+inst_fir_narrow
+(
+	.clk_H(clk_70M),
+	.samp_clk(clk_44k),
+	.in_1(in_I),
+	.in_2(in_Q),
+    .out_1(narrow_I),
+	.out_2(narrow_Q)
+);
+
+
+cordic_fullser_angmag
+#(
+    .STAGES(24),                       
+    .ANG_MSB(23),                 
+    .IN_MSB(23)                   
+)
+inst_and_demod
+(
+    .sin_in(narrow_I),
+    .cos_in(narrow_Q),
+    .ang_out(phase_ref),
+    .mag_out(),
+    .samp_clk(clk_44k),
+    .clk_H(clk_70M)
+);
 
 
 reg signed [23:0]ph_acc;
