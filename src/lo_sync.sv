@@ -8,31 +8,37 @@ module lo_sync
 );
 
 
-reg signed [31:0]ph_acc;
-wire signed [23:0]phase_fb;             // Same as phase_ref
-assign phase_fb[23:0] = ph_acc[31:8];
+localparam FREQ_TAU_BITS = 14;
+localparam PHASE_INJECT_BITS = 3;
 
-localparam TAU_BITS = 10;
 
-wire signed [24:0]f0;       // By 7 bits smaller than ph_acc, giving approx 344 Hz p-p band at 44.1 ksps
-reg signed [24+TAU_BITS:0]itgr;
-assign f0 = itgr[24+TAU_BITS:TAU_BITS];
+reg signed [23:0]ph_acc;
+wire signed [16:0]f0;                   // Band (p-p) is 44.1 kHz / (23-16) = 345 Hz
+reg signed [16+FREQ_TAU_BITS:0]itgr;
+assign f0 = itgr[16+FREQ_TAU_BITS:FREQ_TAU_BITS];
 
-wire signed [23:0]phase_err;
-assign phase_err = phase_ref - phase_fb;
+wire signed [23:0]phase_diff;
+assign phase_diff = phase_ref - ph_acc;
+reg signed [23:0]phase_diff_prev;
+wire signed [23:0]freq_diff;
+assign freq_diff = phase_diff - phase_diff_prev;
 
-wire unsigned [23:0]phase_cordic;
-assign phase_cordic = {~phase_fb[23], phase_fb[22:0]};
+
 
 always @ (posedge clk_44k)
 begin
 
     ph_acc <= ph_acc + f0;
 
-    itgr <= itgr + phase_err;
+    itgr <= itgr + freq_diff + (phase_diff >>> (24-PHASE_INJECT_BITS));
 
+    phase_diff_prev <= phase_diff;
 
 end
+
+
+wire unsigned [23:0]phase_cordic;
+assign phase_cordic = {~ph_acc[23], ph_acc[22:0]};
 
 
 cordic_fullser_sincos                           
@@ -54,3 +60,4 @@ inst_cordic_sync
 
 
 endmodule
+
