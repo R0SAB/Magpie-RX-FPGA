@@ -10,7 +10,7 @@ module lo_sync
 
 
 localparam FREQ_TAU_BITS = 12;
-localparam PHASE_INJECT_BITS = 2;
+localparam PHASE_INJECT_BITS = 3;
 
 wire signed [23:0]narrow_I;
 wire signed [23:0]narrow_Q;
@@ -56,7 +56,7 @@ inst_and_demod
 
 reg signed [23:0]ph_acc;
 wire signed [16:0]f0;                   // Band (p-p) is 44.1 kHz / (23-16) = 345 Hz
-reg signed [16+FREQ_TAU_BITS:0]itgr;
+reg signed [1+16+FREQ_TAU_BITS:0]itgr;
 assign f0 = itgr[16+FREQ_TAU_BITS:FREQ_TAU_BITS];
 
 wire signed [23:0]phase_diff;
@@ -65,14 +65,22 @@ reg signed [23:0]phase_diff_prev;
 wire signed [23:0]freq_diff;
 assign freq_diff = phase_diff - phase_diff_prev;
 
+wire signed [23:0]full_error;
+assign full_error = freq_diff + (phase_diff >>> (24-PHASE_INJECT_BITS));
 
+wire signed [1+16+FREQ_TAU_BITS:0]itgr_next;
+assign itgr_next = itgr + full_error;
 
 always @ (posedge clk_44k)
 begin
 
     ph_acc <= ph_acc + f0;
 
-    itgr <= itgr + freq_diff + (phase_diff >>> (24-PHASE_INJECT_BITS));
+    if(itgr_next > (1 <<< (16+FREQ_TAU_BITS))) itgr <= (1 <<< (16+FREQ_TAU_BITS));
+    else
+    if(itgr_next < -(1 <<< (16+FREQ_TAU_BITS))) itgr <= -(1 <<< (16+FREQ_TAU_BITS));
+    else
+    itgr <= itgr_next;
 
     phase_diff_prev <= phase_diff;
 

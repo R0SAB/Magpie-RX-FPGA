@@ -152,28 +152,6 @@ inst_fir_bw
 );
 
 
-// ########################### AM DEMOD ################################
-
-wire [24:0]am_demod_out;
-wire signed [23:0]baseband_phase;
-
-cordic_fullser_angmag
-#(
-    .STAGES(24),                       
-    .ANG_MSB(23),                 
-    .IN_MSB(23)                   
-)
-inst_and_demod
-(
-    .sin_in(bw_I_out + 45),
-    .cos_in(bw_Q_out + 45),
-    .ang_out(baseband_phase),
-    .mag_out(am_demod_out),
-    .samp_clk(clk_44k),
-    .clk_H(clk_70M)
-);
-
-
 // ######################### SSB DEMOD #############################
 
 wire [23:0]ssb_demod_out;
@@ -230,40 +208,12 @@ begin
     else mod_switch_out <= ssb_demod_out;
 end
 
-// ########################## FIR CLEANUP #############################
-
-
-wire signed [23:0]cleanup_out;
-
-
-fir_3roms
-#(
-	.ORDER(150),
-	.IN_MSB(23),
-	.OUT_MSB(23),
-	.TAPS_MSB(23),
-	.GAIN_BITS(2),
-	.ROM_FILE_0("src/fir_coeffs/fir_cleanup_5k.txt"),
-    .ROM_FILE_1("src/fir_coeffs/fir_cleanup_3k.txt"),
-	.SAMP_SKIP(0)
-)
-inst_fir_cleanup
-(
-	.clk_H(clk_70M),
-	.samp_clk(clk_44k),
-	.in_1(mod_switch_out),
-	.in_2(0),
-    .out_1(cleanup_out),
-	.out_2(),
-    .bw_in((bandwidth == 2'd0) ? 2'd0 : 2'd1)
-);
-
 
 // ################################ S-METER AND AGC ####################################
 
 s_meter inst_s_meter
 (
-    .amplitude_in(cleanup_out),
+    .amplitude_in(mod_switch_out),
     .s_meter_out(s_meter_value),
     .clk_44k(clk_44k)
 );
@@ -272,7 +222,7 @@ wire signed [23:0]agc_out;
 
 agc inst_agc
 (
-    .audio_in(cleanup_out),
+    .audio_in(mod_switch_out),
     .audio_out(agc_out),
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),
