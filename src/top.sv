@@ -189,6 +189,35 @@ ssb_demod inst_ssb_demod
     .ssb_flip((modulation == 2'd0) ? 1'b1 : 1'b0)
 );
 
+// ########################## SYNC AM DEMOD ##########################
+
+reg signed [23:0]delay[0:255];
+reg signed [23:0]delay_out;
+reg signed [23:0]sync_I;
+reg signed [46:0]sync_mult_I;
+reg signed [23:0]sync_Q;
+reg signed [46:0]sync_mult_Q;
+reg signed [24:0]sync_sum;
+reg signed [23:0]sync_am_out;
+
+always @ (posedge clk_44k)
+begin
+
+    //delay_out <= delay[255];
+    //for(int i=1; i<256; i++) delay[i] <= delay[i-1];
+    //delay[0] <= ssb_demod_out;
+
+    sync_mult_I <= bw_I_out * sync_car_sin;
+    sync_mult_Q <= bw_Q_out * sync_car_cos;
+
+    sync_I <= sync_mult_I[46:23];
+    sync_Q <= sync_mult_Q[46:23];
+
+    sync_sum <= sync_I + sync_Q;
+    sync_am_out <= sync_sum[23:0];
+
+end
+
 
 // ######################### MOD SWITCH ############################
 
@@ -196,7 +225,8 @@ reg [23:0]mod_switch_out;
 
 always @ (posedge clk_44k)
 begin
-    if(modulation == 2) mod_switch_out <= (am_demod_out >>> 1) - 110;
+    //if(modulation == 2) mod_switch_out <= (am_demod_out >>> 1) - 110;
+    if(modulation == 2) mod_switch_out <= sync_am_out;
     else mod_switch_out <= ssb_demod_out;
 end
 
@@ -242,7 +272,7 @@ wire signed [23:0]agc_out;
 
 agc inst_agc
 (
-    .audio_in(cleanup_out + (sync_car_cos >>> 10)),
+    .audio_in(cleanup_out),
     .audio_out(agc_out),
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),

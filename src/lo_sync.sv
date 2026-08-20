@@ -9,8 +9,8 @@ module lo_sync
 );
 
 
-localparam FREQ_TAU_BITS = 14;
-localparam PHASE_INJECT_BITS = 3;
+localparam FREQ_TAU_BITS = 12;
+localparam PHASE_INJECT_BITS = 2;
 
 wire signed [23:0]narrow_I;
 wire signed [23:0]narrow_Q;
