@@ -148,7 +148,7 @@ inst_fir_bw
 	.in_2(downsamp_Q),
     .out_1(bw_I_out),
 	.out_2(bw_Q_out),
-    .bw_in(bw_in)
+    .bw_in(bandwidth)
 );
 
 
