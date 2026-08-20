@@ -226,7 +226,7 @@ agc inst_agc
     .audio_out(agc_out),
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),
-    .mode((modulation == 2'd2) ? 1 : 0)
+    .mode(/*(modulation == 2'd2) ? 1 : 0*/ 0)
 );
 
 
