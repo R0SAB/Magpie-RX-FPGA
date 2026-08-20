@@ -14,7 +14,7 @@ reg [1:0]clk_44k_eg;
 reg signed [23:0]detector;
 reg signed [23:0]detector_qpeak;
 wire signed [23:0]target;
-assign target = (mode) ? 7000 : 5000;
+assign target = (mode) ? 10000 : 5000;
 
 reg signed [30:0]itgr;
 wire signed [15:0]itgr_output;
@@ -39,8 +39,9 @@ begin
         if(detector_qpeak < detector) detector_qpeak <= detector_qpeak + (detector - detector_qpeak);
         else detector_qpeak <= detector_qpeak - (detector_qpeak >>> 7);
         
-        if(mode) itgr <= itgr + target - detector;
-        else  itgr <= itgr + target - detector_qpeak;
+        //if(mode) itgr <= itgr + target - detector;
+        //else
+        itgr <= itgr + target - detector_qpeak;
 
         multiplier <= itgr_output * audio_in;
         audio_out[23:0] <= multiplier[35:12];
