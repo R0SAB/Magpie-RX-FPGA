@@ -68,10 +68,13 @@ assign freq_diff = phase_diff - phase_diff_prev;
 wire signed [1+16+FREQ_TAU_BITS:0]itgr_next;
 assign itgr_next = itgr + freq_diff;
 
+wire signed [1:0]phase_correction;
+assign phase_correction = (phase_diff > 0) ? 2'd1 : -2'd1;
+
 always @ (posedge clk_44k)
 begin
 
-    ph_acc <= ph_acc + f0 + (phase_diff >>> (24-PHASE_INJECT_BITS));
+    ph_acc <= ph_acc + f0 + phase_correction/*(phase_diff >>> (24-PHASE_INJECT_BITS))*/;
 
     if(itgr_next > (1 <<< (16+FREQ_TAU_BITS))) itgr <= (1 <<< (16+FREQ_TAU_BITS));
     else
