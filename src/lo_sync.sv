@@ -43,7 +43,7 @@ cordic_fullser_angmag
     .ANG_MSB(23),                 
     .IN_MSB(23)                   
 )
-inst_and_demod
+inst_cordic_phase_ref
 (
     .sin_in(narrow_I),
     .cos_in(narrow_Q),
