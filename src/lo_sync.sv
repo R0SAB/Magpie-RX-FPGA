@@ -76,7 +76,7 @@ begin
 
     ph_acc <= ph_acc + f0;
 
-    if(itgr_next > (1 <<< (16+FREQ_TAU_BITS))) itgr <= (1 <<< (16+FREQ_TAU_BITS));
+    if(itgr_next > ((1 <<< (16+FREQ_TAU_BITS))-1)) itgr <= ((1 <<< (16+FREQ_TAU_BITS))-1);
     else
     if(itgr_next < -(1 <<< (16+FREQ_TAU_BITS))) itgr <= -(1 <<< (16+FREQ_TAU_BITS));
     else

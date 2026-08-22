@@ -125,8 +125,8 @@ lo_sync inst_lo_sync
     .sync_car_sin(sync_car_sin)    
 );
 
-assign probe_1 = inst_lo_sync.phase_ref[23];
-assign probe_2 = inst_lo_sync.ph_acc[23];
+//assign probe_1 = inst_lo_sync.phase_ref[23];
+//assign probe_2 = inst_lo_sync.ph_acc[23];
 
 // ########################### FIR BW ##############################
 
