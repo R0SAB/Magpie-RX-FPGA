@@ -12,7 +12,10 @@ module top
     input wire signed [13:0]adc_in,
     input wire adc_dry,
 
-    output wire mcu_ss_clk
+    output wire mcu_ss_clk,
+
+    output wire probe_1,
+    output wire probe_2
 );
 
 
@@ -122,6 +125,8 @@ lo_sync inst_lo_sync
     .sync_car_sin(sync_car_sin)    
 );
 
+assign probe_1 = inst_lo_sync.phase_ref[23];
+assign probe_2 = inst_lo_sync.ph_acc[23];
 
 // ########################### FIR BW ##############################
 
@@ -178,15 +183,28 @@ reg signed [46:0]sync_mult_Q;
 reg signed [24:0]sync_sum;
 reg signed [23:0]sync_am_out;
 
+localparam SYNC_CAR_DELAY = 256;
+
+reg signed [23:0]sync_cos_fifo[0:SYNC_CAR_DELAY-1];
+reg signed [23:0]sync_sin_fifo[0:SYNC_CAR_DELAY-1];
+reg signed [23:0]sync_car_cos_dly;
+reg signed [23:0]sync_car_sin_dly;
+
 always @ (posedge clk_44k)
 begin
 
-    //delay_out <= delay[255];
-    //for(int i=1; i<256; i++) delay[i] <= delay[i-1];
-    //delay[0] <= ssb_demod_out;
+    sync_car_cos_dly <= sync_cos_fifo[SYNC_CAR_DELAY-1];
+    sync_car_sin_dly <= sync_sin_fifo[SYNC_CAR_DELAY-1];
+    for(int i=1; i<SYNC_CAR_DELAY; i++)
+    begin
+        sync_cos_fifo[i] <= sync_cos_fifo[i-1];
+        sync_sin_fifo[i] <= sync_sin_fifo[i-1];
+    end
+    sync_cos_fifo[0] <= sync_car_cos;
+    sync_sin_fifo[0] <= sync_car_sin;
 
-    sync_mult_I <= bw_I_out * sync_car_sin;
-    sync_mult_Q <= bw_Q_out * sync_car_cos;
+    sync_mult_I <= bw_I_out * sync_car_sin_dly;
+    sync_mult_Q <= bw_Q_out * sync_car_cos_dly;
 
     sync_I <= sync_mult_I[46:23];
     sync_Q <= sync_mult_Q[46:23];
