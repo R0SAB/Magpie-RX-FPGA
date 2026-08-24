@@ -13,41 +13,40 @@ parameter IN_MSB = 20                   // Разрядность входных
     input wire clk_H
 );
 
-wire [ANG_MSB-1:0]atan_full[0:31];                             // Таблица значений арктангенсов от atan(2^0) до atan(2^-31), отнормирована к полной шкале 32 бит для первого значения (пи/4)
-localparam ATAN_SHIFT = (32-ANG_MSB+2);
+wire signed [31:0] atan_full [0:31];
 
-assign atan_full[0] = 32'd4294967295 >>> ATAN_SHIFT;
-assign atan_full[1] = 32'd2535467245 >>> ATAN_SHIFT;
-assign atan_full[2] = 32'd1339671259 >>> ATAN_SHIFT;
-assign atan_full[3] = 32'd680038049 >>> ATAN_SHIFT;
-assign atan_full[4] = 32'd341338648 >>> ATAN_SHIFT;
-assign atan_full[5] = 32'd170835723 >>> ATAN_SHIFT;
-assign atan_full[6] = 32'd85438707 >>> ATAN_SHIFT;
-assign atan_full[7] = 32'd42721961 >>> ATAN_SHIFT;
-assign atan_full[8] = 32'd21361306 >>> ATAN_SHIFT;
-assign atan_full[9] = 32'd10680694 >>> ATAN_SHIFT;
-assign atan_full[10] = 32'd5340352 >>> ATAN_SHIFT;
-assign atan_full[11] = 32'd2670177 >>> ATAN_SHIFT;
-assign atan_full[12] = 32'd1335088 >>> ATAN_SHIFT;
-assign atan_full[13] = 32'd667544 >>> ATAN_SHIFT;
-assign atan_full[14] = 32'd333772 >>> ATAN_SHIFT;
-assign atan_full[15] = 32'd166886 >>> ATAN_SHIFT;
-assign atan_full[16] = 32'd83443 >>> ATAN_SHIFT;
-assign atan_full[17] = 32'd41722 >>> ATAN_SHIFT;
-assign atan_full[18] = 32'd20861 >>> ATAN_SHIFT;
-assign atan_full[19] = 32'd10430 >>> ATAN_SHIFT;
-assign atan_full[20] = 32'd5215 >>> ATAN_SHIFT;
-assign atan_full[21] = 32'd2608 >>> ATAN_SHIFT;
-assign atan_full[22] = 32'd1304 >>> ATAN_SHIFT;
-assign atan_full[23] = 32'd652 >>> ATAN_SHIFT;
-assign atan_full[24] = 32'd326 >>> ATAN_SHIFT;
-assign atan_full[25] = 32'd163 >>> ATAN_SHIFT;
-assign atan_full[26] = 32'd81 >>> ATAN_SHIFT;
-assign atan_full[27] = 32'd41 >>> ATAN_SHIFT;
-assign atan_full[28] = 32'd20 >>> ATAN_SHIFT;
-assign atan_full[29] = 32'd10 >>> ATAN_SHIFT;
-assign atan_full[30] = 32'd5 >>> ATAN_SHIFT;
-assign atan_full[31] = 32'd3 >>> ATAN_SHIFT;
+assign atan_full[0]  = 32'sd536870912;  // atan(2^0)
+assign atan_full[1]  = 32'sd316933406;  // atan(2^-1)
+assign atan_full[2]  = 32'sd167458907;  // atan(2^-2)
+assign atan_full[3]  = 32'sd85004756;   // atan(2^-3)
+assign atan_full[4]  = 32'sd42667331;   // atan(2^-4)
+assign atan_full[5]  = 32'sd21354465;   // atan(2^-5)
+assign atan_full[6]  = 32'sd10679838;   // atan(2^-6)
+assign atan_full[7]  = 32'sd5340245;    // atan(2^-7)
+assign atan_full[8]  = 32'sd2670163;    // atan(2^-8)
+assign atan_full[9]  = 32'sd1335087;    // atan(2^-9)
+assign atan_full[10] = 32'sd665817;     // atan(2^-10)
+assign atan_full[11] = 32'sd332912;     // atan(2^-11)
+assign atan_full[12] = 32'sd166456;     // atan(2^-12)
+assign atan_full[13] = 32'sd83228;      // atan(2^-13)
+assign atan_full[14] = 32'sd41614;      // atan(2^-14)
+assign atan_full[15] = 32'sd20807;      // atan(2^-15)
+assign atan_full[16] = 32'sd10404;      // atan(2^-16)
+assign atan_full[17] = 32'sd5202;       // atan(2^-17)
+assign atan_full[18] = 32'sd2601;       // atan(2^-18)
+assign atan_full[19] = 32'sd1301;       // atan(2^-19)
+assign atan_full[20] = 32'sd650;        // atan(2^-20)
+assign atan_full[21] = 32'sd325;        // atan(2^-21)
+assign atan_full[22] = 32'sd163;        // atan(2^-22)
+assign atan_full[23] = 32'sd81;         // atan(2^-23)
+assign atan_full[24] = 32'sd41;         // atan(2^-24)
+assign atan_full[25] = 32'sd20;         // atan(2^-25)
+assign atan_full[26] = 32'sd10;         // atan(2^-26)
+assign atan_full[27] = 32'sd5;          // atan(2^-27)
+assign atan_full[28] = 32'sd3;          // atan(2^-28)
+assign atan_full[29] = 32'sd1;          // atan(2^-29)
+assign atan_full[30] = 32'sd1;          // atan(2^-30)
+assign atan_full[31] = 32'sd0;          // atan(2^-31)
 
 
 reg [1:0]samp_clk_eg = 0;
@@ -59,7 +58,10 @@ reg sign = 0;                                           // Знак приращ
 reg signed [IN_MSB+1:0]sin_shift = 0;                    // Сдвинутые синус и косинус для каждой ступени
 reg signed [IN_MSB+1:0]cos_shift = 0;
 
-reg signed [ANG_MSB:0]angle_buf = 0;             // Память для ошибки угла (угол обратной связи - feedback angle)
+reg signed [31:0]angle_buf = 0;             // Память для ошибки угла (угол обратной связи - feedback angle)
+reg signed [31:0]angle_unwrapped = 0;
+wire signed [ANG_MSB:0]angle_trunc;
+assign angle_trunc = angle_unwrapped[31:31-ANG_MSB];
 wire [1:0]quadrant;                                             // Квадрант, в котором находится входная фаза
 reg [1:0]quadrant_buf;
                                
@@ -91,11 +93,13 @@ begin
         shift_inh <= 1;
 
         case(quadrant_buf)                                                                // Выходное значение фазы - разворачивается из первого квадранта в исходный, в зависимости от задержанного сигнала квадранта
-        2'd0: ang_out <= angle_buf;                       // Поворот не требуется
-        2'd2: ang_out <= angle_buf + (2**(ANG_MSB-1));    // +пи/2
-        2'd3: ang_out <= angle_buf - (2**(ANG_MSB));      // -пи
-        2'd1: ang_out <= angle_buf - (2**(ANG_MSB-1));    // -пи-2
+        2'd0: angle_unwrapped <= angle_buf;                       // Поворот не требуется
+        2'd2: angle_unwrapped <= angle_buf + (2**(31-1));    // +пи/2
+        2'd3: angle_unwrapped <= angle_buf - (2**(31));      // -пи
+        2'd1: angle_unwrapped <= angle_buf - (2**(31-1));    // -пи-2
         endcase
+
+        ang_out <= angle_trunc;
 
         mag_out <= cos_buf;
 
