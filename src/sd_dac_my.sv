@@ -11,7 +11,7 @@ localparam TAU_BITS = 8;
 reg signed [15+TAU_BITS:0]itgr;
 assign out = itgr[15+TAU_BITS];
 wire signed [15:0]level;
-assign level = out ? -30000 : 30000;
+assign level = out ? 32767 : -32768;
 
 
 always @ (posedge clk)
