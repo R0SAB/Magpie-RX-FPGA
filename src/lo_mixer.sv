@@ -43,7 +43,7 @@ cordic_pipeline_sincos              // CORDIC - both carrier generator and I/Q m
 inst_cordic_f0
 (
 .phase_in(cordic_phase),                   
-.start_length({adc_abs[13:0], 2'b00}),               
+.start_length({1'b0, adc_abs[13:0], 1'b0}),               
 .clk_H(clk_70M),
 .sin_out(Q_out),
 .cos_out(I_out)

@@ -20,7 +20,7 @@ reg signed [30:0]itgr;
 wire signed [15:0]itgr_output;
 assign itgr_output[15:0] = itgr[30:15];
 
-reg signed [37:0]multiplier;
+reg signed [35:0]multiplier;
 
 
 
@@ -44,7 +44,7 @@ begin
         itgr <= itgr + target - detector_qpeak;
 
         multiplier <= itgr_output * audio_in;
-        audio_out[23:0] <= multiplier[37:14];
+        audio_out[23:0] <= multiplier[35:12];
 
         if(itgr > ('b11 <<< 27)) itgr <= ('b11 <<< 27);
 
