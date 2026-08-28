@@ -287,13 +287,25 @@ volume_control inst_volume
     .clk_44k(clk_44k)
 );
 
+/*
 sd_dac_my inst_audio_dac
 (
     .clk(clk_70M),
     .in(volume_audio_out - 1001),
     .out(sd_dac_out)
 );
+*/
 
+frac_pwm
+#(
+    .COUNTER_BITS(5)
+)
+inst_audio_dac
+(
+    .clk(clk_70M),
+    .din(volume_audio_out + 1000),
+    .pwm(sd_dac_out)
+);
 
 
 // ############################# MCU SS CLOCK ###############################
