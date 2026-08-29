@@ -4,8 +4,8 @@ module downsampler
     input wire signed [15:0]het_Q_in,
     input wire clk_70M,
 
-    output wire [17:0]downsamp_I_out,
-    output wire [17:0]downsamp_Q_out,
+    output wire [23:0]downsamp_I_out,
+    output wire [23:0]downsamp_Q_out,
     output reg clk_441k,
     output reg clk_44k
 
@@ -37,15 +37,15 @@ end
 
 // ########################### CIC #############################
 
-wire signed [17:0]cic_I_out;
-wire signed [17:0]cic_Q_out;
+wire signed [23:0]cic_I_out;
+wire signed [23:0]cic_Q_out;
 
 CIC_decim
 #(
     .ORDER(3),
     .DELAY(320),
     .IN_MSB(15),
-    .OUT_MSB(17)
+    .OUT_MSB(23)
 )
 inst_cic_I
 ( 
@@ -61,7 +61,7 @@ CIC_decim
     .ORDER(3),
     .DELAY(320),
     .IN_MSB(15),
-    .OUT_MSB(17)
+    .OUT_MSB(23)
 )
 inst_cic_Q
 ( 
@@ -77,9 +77,9 @@ inst_cic_Q
 fir
 #(
 	.ORDER(150),
-	.IN_MSB(17),
-	.OUT_MSB(17),
-	.TAPS_MSB(17),
+	.IN_MSB(23),
+	.OUT_MSB(23),
+	.TAPS_MSB(23),
 	.GAIN_BITS(4),
 	.ROM_FILE("src/fir_coeffs/fir_decim.txt"),
 	.SAMP_SKIP(0)

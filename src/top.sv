@@ -94,8 +94,8 @@ lo_mixer inst_lo
 
 wire clk_441k;
 wire clk_44k;
-wire [17:0]downsamp_I;
-wire [17:0]downsamp_Q;
+wire [23:0]downsamp_I;
+wire [23:0]downsamp_Q;
 
 downsampler inst_downsampler
 (
@@ -136,7 +136,7 @@ wire signed [23:0]bw_Q_out;
 fir_3roms
 #(
 	.ORDER(1022),
-	.IN_MSB(17),
+	.IN_MSB(23),
 	.OUT_MSB(23),
 	.TAPS_MSB(23),
 	.GAIN_BITS(2),

@@ -11,7 +11,7 @@ wire signed [23:0]itgr_out;
 assign itgr_out = itgr[35:12];
 
 wire [15:0]s_mask;
-localparam S_SHIFT = 3;
+localparam S_SHIFT = 4;
 assign s_mask = itgr_out[15+S_SHIFT:0+S_SHIFT];
 
 

@@ -1,7 +1,7 @@
 module lo_sync
 (
-    input wire signed [17:0]in_I,
-    input wire signed [17:0]in_Q,
+    input wire signed [23:0]in_I,
+    input wire signed [23:0]in_Q,
     input wire clk_44k,
     input wire clk_70M,
     output wire signed [23:0]sync_car_cos,
@@ -19,7 +19,7 @@ wire signed [23:0]phase_ref;
 fir
 #(
 	.ORDER(510),
-	.IN_MSB(17),
+	.IN_MSB(23),
 	.OUT_MSB(23),
 	.TAPS_MSB(23),
 	.GAIN_BITS(6),
