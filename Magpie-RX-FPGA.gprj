@@ -8,6 +8,7 @@
         <File path="src/CIC_decim.v" type="file.verilog" enable="1"/>
         <File path="src/SD_DAC.v" type="file.verilog" enable="1"/>
         <File path="src/agc.sv" type="file.verilog" enable="1"/>
+        <File path="src/bass_booster.sv" type="file.verilog" enable="1"/>
         <File path="src/cordic_fullser_angmag.v" type="file.verilog" enable="1"/>
         <File path="src/cordic_fullser_sincos.v" type="file.verilog" enable="1"/>
         <File path="src/cordic_pipeline_sincos.v" type="file.verilog" enable="1"/>

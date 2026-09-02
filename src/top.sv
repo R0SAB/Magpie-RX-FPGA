@@ -260,14 +260,25 @@ dc_remover inst_dc_remover
     .clk_44k(clk_44k)
 );
 
+// ############################ BASS BOOST ###############################
 
-// ########################### CLAMP, VOLUME CONTROL AND SD DAC ##############################
+wire signed [23:0]bass_boost_out;
+
+bass_booster inst_bass_boost
+(
+    .in(dc_remover_out),
+    .out(bass_boost_out),
+    .clk_44k(clk_44k)
+);
+
+
+// ########################### BASS BOOST, CLAMP, VOLUME CONTROL AND SD DAC ##############################
 
 
 wire signed [23:0]clamp_in;
 reg signed [15:0]clamp_out;
 
-assign clamp_in = dc_remover_out;
+assign clamp_in = /*dc_remover_out*/bass_boost_out;
 
 always @ (posedge clk_44k)
 begin
@@ -287,15 +298,15 @@ volume_control inst_volume
     .clk_44k(clk_44k)
 );
 
-/*
+
 sd_dac_my inst_audio_dac
 (
     .clk(clk_70M),
-    .in(volume_audio_out - 1001),
+    .in(volume_audio_out),
     .out(sd_dac_out)
 );
-*/
 
+/*
 frac_pwm
 #(
     .COUNTER_BITS(5)
@@ -306,7 +317,7 @@ inst_audio_dac
     .din(volume_audio_out + 1000),
     .pwm(sd_dac_out)
 );
-
+*/
 
 // ############################# MCU SS CLOCK ###############################
 
