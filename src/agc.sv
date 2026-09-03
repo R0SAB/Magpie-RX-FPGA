@@ -16,9 +16,9 @@ reg signed [23:0]detector;
 reg signed [23:0]detector_qpeak;
 logic signed [23:0]target;
 
-reg signed [23+13:0]dc_itgr;
+reg signed [23+11:0]dc_itgr;
 wire signed [23:0]dc_level;
-assign dc_level = dc_itgr >>> 13;
+assign dc_level = dc_itgr >>> 11;
 wire carrier_present;
 assign carrier_present = (dc_level > (1 <<< 8)) ? 1 : 0;
 
