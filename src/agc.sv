@@ -8,13 +8,32 @@ module agc
     input wire mode       // 0 - qPeak; 1 - Mean
 );
 
+typedef enum integer {MOD_SSB = 0, MOD_AM = 1} modulation_enum;
 
 reg [1:0]clk_44k_eg;
 
 reg signed [23:0]detector;
 reg signed [23:0]detector_qpeak;
-wire signed [23:0]target;
-assign target = (mode) ? 10000 : 5000;
+logic signed [23:0]target;
+
+reg signed [23+10:0]dc_itgr;
+wire signed [23:0]dc_level;
+assign dc_level = dc_itgr >>> 10;
+wire carrier_present;
+assign carrier_present = (dc_level > (1 <<< 8)) ? 1 : 0;
+
+always_comb
+begin
+    if(mode == MOD_SSB) target = 5000;
+    else
+    if(mode == MOD_AM)
+    begin
+        if(carrier_present) target = 10000;
+        else target = 2000;
+    end
+end
+
+//assign target = (mode) ? 10000 : 5000;
 
 reg signed [30:0]itgr;
 wire signed [15:0]itgr_output;
@@ -47,6 +66,8 @@ begin
         audio_out[23:0] <= multiplier[35:12];
 
         if(itgr > ('b11 <<< 27)) itgr <= ('b11 <<< 27);
+
+        dc_itgr <= dc_itgr + audio_in - dc_level;
 
 
     end

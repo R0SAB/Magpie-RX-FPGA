@@ -19,6 +19,9 @@ module top
 );
 
 
+typedef enum integer {MOD_LSB = 0, MOD_USB = 1, MOD_AM = 2} modulation_enum;
+
+
 // ########################## MAIN CLOCK 70.56 MHz ##############################
 
 wire clk_70M;              
@@ -228,7 +231,7 @@ begin
 end
 
 
-// ################################ S-METER AND AGC ####################################
+// ################################ S-METER, AM SQUELCH AND AGC ####################################
 
 s_meter inst_s_meter
 (
@@ -245,7 +248,7 @@ agc inst_agc
     .audio_out(agc_out),
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),
-    .mode((modulation == 2'd2) ? 1 : 0)
+    .mode((modulation == MOD_AM) ? 1 : 0)
 );
 
 
