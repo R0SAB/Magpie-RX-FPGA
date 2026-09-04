@@ -66,7 +66,7 @@ wire signed [23:0]freq_diff;
 assign freq_diff = phase_diff - phase_diff_prev;
 
 wire signed [1+16+FREQ_TAU_BITS:0]itgr_next;
-assign itgr_next = itgr + freq_diff - phase_correction - 1;
+assign itgr_next = itgr + freq_diff - phase_correction;
 
 logic signed [23:0]phase_correction;
 
