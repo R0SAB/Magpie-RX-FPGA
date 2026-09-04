@@ -14,6 +14,8 @@ module top
 
     output wire mcu_ss_clk,
 
+    output wire spdif_out,
+
     output wire probe_1,
     output wire probe_2
 );
@@ -285,9 +287,9 @@ assign clamp_in = /*dc_remover_out*/bass_boost_out;
 
 always @ (posedge clk_44k)
 begin
-    if(clamp_in > 30000) clamp_out <= 30000;
+    if(clamp_in > 32000) clamp_out <= 32000;
     else
-    if(clamp_in < -30000) clamp_out  <= -30000;
+    if(clamp_in < -32000) clamp_out  <= -32000;
     else clamp_out <= clamp_in[15:0];
 end
 
@@ -309,18 +311,23 @@ sd_dac_my inst_audio_dac
     .out(sd_dac_out)
 );
 
-/*
-frac_pwm
+spdif_tx
 #(
-    .COUNTER_BITS(5)
+    .CLK_H(70.56)
 )
-inst_audio_dac
+inst_spdif
 (
-    .clk(clk_70M),
-    .din(volume_audio_out + 1000),
-    .pwm(sd_dac_out)
+    .L_in(clamp_out),
+    .R_in(clamp_out),
+    .samp_clk_in(clk_44k),
+    .clk_H(clk_70M),
+    .spdif_out(spdif_out)
 );
-*/
+
+
+
+
+
 
 // ############################# MCU SS CLOCK ###############################
 
