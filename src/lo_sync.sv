@@ -66,10 +66,15 @@ wire signed [23:0]freq_diff;
 assign freq_diff = phase_diff - phase_diff_prev;
 
 wire signed [1+16+FREQ_TAU_BITS:0]itgr_next;
-assign itgr_next = itgr + freq_diff - phase_correction;
+assign itgr_next = itgr + freq_diff - phase_correction - 1;
 
-wire signed [23:0]phase_correction;
-assign phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS);
+logic signed [23:0]phase_correction;
+
+always_comb
+begin
+    if(phase_diff > -(1 <<< 22) && phase_diff < (1 <<< 22)) phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS-3);
+    else phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS);
+end
 
 always @ (posedge clk_44k)
 begin
