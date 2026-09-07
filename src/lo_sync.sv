@@ -19,9 +19,9 @@ wire signed [23:0]phase_ref;
 fir
 #(
 	.ORDER(510),
-	.IN_MSB(23),
+	.IN_MSB(17),
 	.OUT_MSB(23),
-	.TAPS_MSB(23),
+	.TAPS_MSB(17),
 	.GAIN_BITS(6),
 	.ROM_FILE("src/fir_coeffs/fir_0k2_lpf_511.txt"),
 	.SAMP_SKIP(0)
@@ -30,8 +30,8 @@ inst_fir_narrow
 (
 	.clk_H(clk_70M),
 	.samp_clk(clk_44k),
-	.in_1(in_I),
-	.in_2(in_Q),
+	.in_1(in_I[23:6]),
+	.in_2(in_Q[23:6]),
     .out_1(narrow_I),
 	.out_2(narrow_Q)
 );

@@ -39,7 +39,7 @@ reg signed [30:0]itgr;
 wire signed [15:0]itgr_output;
 assign itgr_output[15:0] = itgr[30:15];
 
-reg signed [35:0]multiplier;
+reg signed [35:0]multiplier /* synthesis syn_dspstyle = "logic" */;
 
 
 
@@ -72,8 +72,7 @@ begin
 
     end
 
-    
-
+    if(clk_44k_eg == 2'b10) multiplier <= itgr_output * audio_in;
 
 end
 

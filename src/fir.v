@@ -40,8 +40,8 @@ reg signed [TAPS_MSB:0]rom_read = 0;
 
 reg signed [IN_MSB+TAPS_MSB-1:0]mult_1 = 0;
 reg signed [IN_MSB+TAPS_MSB-1:0]mult_2 = 0;
-reg signed [IN_MSB+TAPS_MSB+GAIN_BITS-1:0]acc_1 = 0;
-reg signed [IN_MSB+TAPS_MSB+GAIN_BITS-1:0]acc_2 = 0;
+reg signed [IN_MSB+TAPS_MSB+GAIN_BITS-1:0]acc_1 = 0 /* synthesis syn_dspstyle = "logic" */;
+reg signed [IN_MSB+TAPS_MSB+GAIN_BITS-1:0]acc_2 = 0 /* synthesis syn_dspstyle = "logic" */;
 reg signed [IN_MSB+TAPS_MSB+GAIN_BITS-1:0]round_1 = 0;
 reg signed [IN_MSB+TAPS_MSB+GAIN_BITS-1:0]round_2 = 0;
 

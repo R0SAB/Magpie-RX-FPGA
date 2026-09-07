@@ -7,9 +7,9 @@ module volume_control
 );
 
 
-reg unsigned [9:0]volume_square;
+reg unsigned [9:0]volume_square /* synthesis syn_dspstyle = "logic" */;
 reg signed [10:0]volume_signed;
-reg signed[25:0]mult;
+reg signed[25:0]mult /* synthesis syn_dspstyle = "logic" */;
 
 
 always @ (posedge clk_44k)
