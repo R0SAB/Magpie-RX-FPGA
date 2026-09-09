@@ -24,10 +24,9 @@ module top
 typedef enum integer {MOD_LSB = 0, MOD_USB = 1, MOD_AM = 2} modulation_enum;
 
 
-// ########################## MAIN CLOCK 70.56 MHz ##############################
+// ########################## MAIN CLOCK 70.56 MHz WITH STARTUP DELAY ##############################
 
 wire clk_70M;              
-//assign clk_70M = adc_dry;
 
 reg [31:0]startup_delay;
 
@@ -113,26 +112,6 @@ downsampler inst_downsampler
 );
 
 
-// ####################### SYNC CARRIER GEN ######################
-
-
-wire signed [23:0]sync_car_cos;
-wire signed [23:0]sync_car_sin;
-
-
-lo_sync inst_lo_sync
-(
-    .in_I(downsamp_I),
-    .in_Q(downsamp_Q),
-    .clk_44k(clk_44k),
-    .clk_70M(clk_70M),
-    .sync_car_cos(sync_car_cos),
-    .sync_car_sin(sync_car_sin)    
-);
-
-//assign probe_1 = inst_lo_sync.phase_ref[23];
-//assign probe_2 = inst_lo_sync.ph_acc[23];
-
 // ########################### FIR BW ##############################
 
 wire signed [23:0]bw_I_out;
@@ -178,47 +157,37 @@ ssb_demod inst_ssb_demod
     .ssb_flip((modulation == 2'd0) ? 1'b1 : 1'b0)
 );
 
+
+// ####################### SYNC LO ######################
+
+
+wire signed [23:0]sync_car_cos;
+wire signed [23:0]sync_car_sin;
+
+
+lo_sync inst_lo_sync
+(
+    .in_I(downsamp_I),
+    .in_Q(downsamp_Q),
+    .clk_44k(clk_44k),
+    .clk_70M(clk_70M),
+    .sync_car_cos(sync_car_cos),
+    .sync_car_sin(sync_car_sin)    
+);
+
 // ########################## SYNC AM DEMOD ##########################
 
-reg signed [23:0]delay[0:255];
-reg signed [23:0]delay_out;
-reg signed [23:0]sync_I;
-reg signed [46:0]sync_mult_I;
-reg signed [23:0]sync_Q;
-reg signed [46:0]sync_mult_Q;
-reg signed [24:0]sync_sum;
-reg signed [23:0]sync_am_out;
+wire signed [23:0]sync_am_out;
 
-localparam SYNC_CAR_DELAY = 256;
-
-reg signed [23:0]sync_cos_fifo[0:SYNC_CAR_DELAY-1];
-reg signed [23:0]sync_sin_fifo[0:SYNC_CAR_DELAY-1];
-reg signed [23:0]sync_car_cos_dly;
-reg signed [23:0]sync_car_sin_dly;
-
-always @ (posedge clk_44k)
-begin
-
-    sync_car_cos_dly <= sync_cos_fifo[SYNC_CAR_DELAY-1];
-    sync_car_sin_dly <= sync_sin_fifo[SYNC_CAR_DELAY-1];
-    for(int i=1; i<SYNC_CAR_DELAY; i++)
-    begin
-        sync_cos_fifo[i] <= sync_cos_fifo[i-1];
-        sync_sin_fifo[i] <= sync_sin_fifo[i-1];
-    end
-    sync_cos_fifo[0] <= sync_car_cos;
-    sync_sin_fifo[0] <= sync_car_sin;
-
-    sync_mult_I <= bw_I_out * sync_car_sin_dly;
-    sync_mult_Q <= bw_Q_out * sync_car_cos_dly;
-
-    sync_I <= sync_mult_I[46:23];
-    sync_Q <= sync_mult_Q[46:23];
-
-    sync_sum <= sync_I + sync_Q;
-    sync_am_out <= sync_sum[23:0];
-
-end
+sync_am_demod inst_sync_am_demod
+(
+    .bb_I_in(bw_I_out),
+    .bb_Q_in(bw_Q_out),
+    .sync_car_cos_in(sync_car_cos),
+    .sync_car_sin_in(sync_car_sin),
+    .clk_44k(clk_44k),
+    .sync_am_out(sync_am_out)
+);
 
 
 // ######################### MOD SWITCH ############################
@@ -227,13 +196,12 @@ reg [23:0]mod_switch_out;
 
 always @ (posedge clk_44k)
 begin
-    //if(modulation == 2) mod_switch_out <= (am_demod_out >>> 1) - 110;
-    if(modulation == 2) mod_switch_out <= sync_am_out;
+    if(modulation == MOD_AM) mod_switch_out <= sync_am_out;
     else mod_switch_out <= ssb_demod_out;
 end
 
 
-// ################################ S-METER, AM SQUELCH AND AGC ####################################
+// ################################ S-METER AND AGC WITH AM SQUELCH ####################################
 
 s_meter inst_s_meter
 (
@@ -277,7 +245,7 @@ bass_booster inst_bass_boost
 );
 
 
-// ########################### BASS BOOST, CLAMP, VOLUME CONTROL AND SD DAC ##############################
+// ########################### CLAMP, VOLUME CONTROL, SD DAC, SPDIF ##############################
 
 
 wire signed [23:0]clamp_in;
@@ -323,8 +291,6 @@ inst_spdif
     .clk_H(clk_70M),
     .spdif_out(spdif_out)
 );
-
-
 
 
 
