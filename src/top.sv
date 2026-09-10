@@ -222,7 +222,7 @@ agc inst_agc
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),
     .mode((modulation == MOD_AM) ? 1 : 0),
-    .carrier_present(status_sync_lock)
+    .carrier_present_out(status_sync_lock)
 );
 
 

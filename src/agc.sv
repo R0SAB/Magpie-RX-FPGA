@@ -6,7 +6,7 @@ module agc
     input wire clk_70M,
 
     input wire mode,       // 0 - qPeak; 1 - Mean
-    output wire carrier_present
+    output reg carrier_present_out
 );
 
 typedef enum integer {MOD_SSB = 0, MOD_AM = 1} modulation_enum;
@@ -20,7 +20,7 @@ logic signed [23:0]target;
 reg signed [23+11:0]dc_itgr;
 wire signed [23:0]dc_level;
 assign dc_level = dc_itgr >>> 11;
-//wire carrier_present;
+wire carrier_present;
 assign carrier_present = (dc_level > (1 <<< 8)) ? 1 : 0;
 
 always_comb
@@ -42,7 +42,8 @@ assign itgr_output[15:0] = itgr[30:15];
 
 reg signed [35:0]multiplier /* synthesis syn_dspstyle = "logic" */;
 
-
+reg [15:0]carrier_present_mm;
+localparam CARRIER_DELAY = 10000;
 
 
 always @ (posedge clk_70M)
@@ -70,6 +71,12 @@ begin
 
         dc_itgr <= dc_itgr + audio_in - dc_level;
 
+        if(~carrier_present) carrier_present_mm <= 0;
+        else
+        if(carrier_present_mm < CARRIER_DELAY) carrier_present_mm <= carrier_present_mm + 1;
+
+        if(carrier_present_mm == CARRIER_DELAY) carrier_present_out <= 1;
+        else carrier_present_out <= 0;
 
     end
 
