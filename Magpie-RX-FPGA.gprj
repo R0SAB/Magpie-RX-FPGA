@@ -20,7 +20,7 @@
         <File path="src/lo_mixer.sv" type="file.verilog" enable="1"/>
         <File path="src/lo_sync.sv" type="file.verilog" enable="1"/>
         <File path="src/mcu_ss_generator.sv" type="file.verilog" enable="1"/>
-        <File path="src/ovr_s_meter_mux.sv" type="file.verilog" enable="1"/>
+        <File path="src/ovr_detector.sv" type="file.verilog" enable="1"/>
         <File path="src/s_meter.sv" type="file.verilog" enable="1"/>
         <File path="src/sd_dac_my.sv" type="file.verilog" enable="1"/>
         <File path="src/spdif_tx.v" type="file.verilog" enable="1"/>

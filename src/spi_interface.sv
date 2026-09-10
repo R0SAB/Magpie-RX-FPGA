@@ -11,7 +11,8 @@ module spi_interface        // MODE 3
     output wire [1:0]modulation_out,
     output wire [1:0]bandwidth_out,
     output reg [7:0]volume_out,
-    input wire [7:0]s_meter_value_in
+    input wire [7:0]s_meter_value_in,
+    input wire [7:0]status_byte_in
 );
 
 reg [7:0]modes;
@@ -19,6 +20,8 @@ reg [7:0]modes_shreg;
 reg [7:0]volume_shreg;
 reg [31:0]f0_shreg;
 reg [7:0]s_meter_shreg;
+reg [7:0]status_byte_shreg;
+
 
 assign modulation_out[1:0] = modes[1:0];
 assign bandwidth_out[1:0] = modes[3:2];
@@ -42,10 +45,15 @@ end
 
 always @(negedge spi_sck or posedge spi_cs)
 begin
-    if (spi_cs) s_meter_shreg <= s_meter_value_in;
+    if (spi_cs)
+    begin
+        s_meter_shreg <= s_meter_value_in;
+        status_byte_shreg <= status_byte_in;
+    end
     else
     begin
-        s_meter_shreg <= {s_meter_shreg[6:0], 1'b0};
+        status_byte_shreg <= {status_byte_shreg[6:0], 1'b0};
+        s_meter_shreg <= {s_meter_shreg[6:0], status_byte_shreg[7]};
         spi_miso <= s_meter_shreg[7];
     end
 end

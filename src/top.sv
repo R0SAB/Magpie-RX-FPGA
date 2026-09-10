@@ -46,7 +46,10 @@ wire [31:0]f0;
 wire [1:0]modulation;
 wire [1:0]bandwidth;
 wire [5:0]volume_5bit;
-wire [7:0]s_meter_spi;
+wire [7:0]s_meter_value;
+
+wire status_ovr;
+wire status_sync_lock;
 
 spi_interface inst_spi
 (
@@ -60,19 +63,19 @@ spi_interface inst_spi
     .bandwidth_out(bandwidth),
     .volume_out(volume_5bit),
 
-    .s_meter_value_in(s_meter_spi)
+    .s_meter_value_in(s_meter_value),
+    .status_byte_in({6'b0, status_sync_lock, status_ovr})
 );
 
 
-// ############################# OVR DETECTOR AND S-METER MUX ##############################
+// ############################# ADC OVR DETECTOR ##############################
 
 wire [7:0]s_meter_value;
 
-ovr_s_meter_mux inst_s_meter_mux
+ovr_detector inst_ovr_detector
 (
     .adc_in(adc_in),
-    .s_meter_in(s_meter_value),
-    .s_meter_out(s_meter_spi),
+    .ovr_out(status_ovr),
     .clk_70M(clk_70M)
 );
 
@@ -218,7 +221,8 @@ agc inst_agc
     .audio_out(agc_out),
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),
-    .mode((modulation == MOD_AM) ? 1 : 0)
+    .mode((modulation == MOD_AM) ? 1 : 0),
+    .carrier_present(status_sync_lock)
 );
 
 
