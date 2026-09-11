@@ -13,15 +13,29 @@ typedef enum integer {MOD_SSB = 0, MOD_AM = 1} modulation_enum;
 
 reg [1:0]clk_44k_eg;
 
-reg signed [23:0]detector;
+reg signed [23:0]abs_in;
+reg signed [23:0]abs_out;
 reg signed [23:0]detector_qpeak;
 logic signed [23:0]target;
 
-reg signed [23+11:0]dc_itgr;
+localparam DC_TAU_BITS = 11;
+localparam MEAN_TAU_BITS = 11;
+localparam GAIN_TAU_BITS = 15;
+
+reg signed [23+DC_TAU_BITS:0]dc_itgr;
 wire signed [23:0]dc_level;
-assign dc_level = dc_itgr >>> 11;
+assign dc_level = dc_itgr >>> DC_TAU_BITS;
+
+reg signed [23+MEAN_TAU_BITS:0]mean_itgr;
+wire signed [23:0]mean_level;
+assign mean_level = mean_itgr >>> MEAN_TAU_BITS;
+
+reg signed [15+GAIN_TAU_BITS:0]gain_itgr;
+wire signed [15:0]gain;
+assign gain[15:0] = gain_itgr >>> GAIN_TAU_BITS;
+
 wire carrier_present;
-assign carrier_present = (dc_level > (1 <<< 8)) ? 1 : 0;
+assign carrier_present = (dc_level > (mean_level >>> 4)) ? 1 : 0;
 
 always_comb
 begin
@@ -34,11 +48,6 @@ begin
     end
 end
 
-//assign target = (mode) ? 10000 : 5000;
-
-reg signed [30:0]itgr;
-wire signed [15:0]itgr_output;
-assign itgr_output[15:0] = itgr[30:15];
 
 reg signed [35:0]multiplier /* synthesis syn_dspstyle = "logic" */;
 
@@ -54,22 +63,22 @@ begin
     if(clk_44k_eg == 2'b01)
     begin
 
-        if(audio_out[23]) detector <= -audio_out;
-        else detector <= audio_out;
+        if(audio_in[23]) abs_in <= -audio_in;
+        else abs_in <= audio_in;
 
-        if(detector_qpeak < detector) detector_qpeak <= detector_qpeak + (detector - detector_qpeak);
+        if(audio_out[23]) abs_out <= -audio_out;
+        else abs_out <= audio_out;
+
+        if(detector_qpeak < abs_out) detector_qpeak <= detector_qpeak + (abs_out - detector_qpeak);
         else detector_qpeak <= detector_qpeak - (detector_qpeak >>> 7);
         
-        //if(mode) itgr <= itgr + target - detector;
-        //else
-        itgr <= itgr + target - detector_qpeak;
-
-        multiplier <= itgr_output * audio_in;
-        audio_out[23:0] <= multiplier[35:12];
-
-        if(itgr > ('b11 <<< 27)) itgr <= ('b11 <<< 27);
-
+        mean_itgr <= mean_itgr + abs_in - mean_level;
         dc_itgr <= dc_itgr + audio_in - dc_level;
+        gain_itgr <= gain_itgr + target - detector_qpeak;
+        if(gain_itgr > ('b11 <<< 27)) gain_itgr <= ('b11 <<< 27);
+
+        multiplier <= gain * audio_in;
+        audio_out[23:0] <= multiplier[35:12];
 
         if(~carrier_present) carrier_present_mm <= 0;
         else
@@ -80,7 +89,7 @@ begin
 
     end
 
-    if(clk_44k_eg == 2'b10) multiplier <= itgr_output * audio_in;
+    if(clk_44k_eg == 2'b10) multiplier <= gain * audio_in;
 
 end
 
