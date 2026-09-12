@@ -1,59 +1,57 @@
-//Copyright (C)2014-2025 Gowin Semiconductor Corporation.
+//Copyright (C)2014-2024 Gowin Semiconductor Corporation.
 //All rights reserved. 
 //File Title: Physical Constraints file
-//Tool Version: V1.9.11.01 (64-bit)
-//Part Number: GW2A-LV18PG256C8/I7
-//Device: GW2A-18
-//Device Version: C
-//Created Time: Fri 09 04 10:22:50 2026
+//Tool Version: V1.9.11 (64-bit)
+//Part Number: GW5A-LV25MG121NC1/I0
+//Device: GW5A-25
+//Device Version: B
+//Created Time: Sat 09 12 17:31:55 2026
 
-IO_LOC "probe_2" L13;
 IO_PORT "probe_2" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
-IO_LOC "probe_1" K11;
 IO_PORT "probe_1" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
-IO_LOC "spdif_out" N7;
+IO_LOC "spdif_out" A10;
 IO_PORT "spdif_out" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
-IO_LOC "mcu_ss_clk" K12;
+IO_LOC "mcu_ss_clk" L9;
 IO_PORT "mcu_ss_clk" IO_TYPE=LVCMOS33 PULL_MODE=UP DRIVE=8 BANK_VCCIO=3.3;
-IO_LOC "sd_dac_out" K13;
+IO_LOC "sd_dac_out" K9;
 IO_PORT "sd_dac_out" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
-IO_LOC "spi_miso" J12;
+IO_LOC "spi_miso" J8;
 IO_PORT "spi_miso" IO_TYPE=LVCMOS33 PULL_MODE=NONE DRIVE=8 BANK_VCCIO=3.3;
-IO_LOC "adc_dry" D14;
+IO_LOC "adc_dry" E11;
 IO_PORT "adc_dry" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[13]" F14;
+IO_LOC "adc_in[13]" L11;
 IO_PORT "adc_in[13]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[12]" F16;
+IO_LOC "adc_in[12]" K11;
 IO_PORT "adc_in[12]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[11]" G14;
+IO_LOC "adc_in[11]" K10;
 IO_PORT "adc_in[11]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[10]" G15;
+IO_LOC "adc_in[10]" L10;
 IO_PORT "adc_in[10]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[9]" J16;
+IO_LOC "adc_in[9]" L8;
 IO_PORT "adc_in[9]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[8]" J14;
+IO_LOC "adc_in[8]" L7;
 IO_PORT "adc_in[8]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[7]" F13;
+IO_LOC "adc_in[7]" J7;
 IO_PORT "adc_in[7]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[6]" G12;
+IO_LOC "adc_in[6]" K7;
 IO_PORT "adc_in[6]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[5]" M15;
+IO_LOC "adc_in[5]" K6;
 IO_PORT "adc_in[5]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[4]" M14;
+IO_LOC "adc_in[4]" L6;
 IO_PORT "adc_in[4]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[3]" R13;
+IO_LOC "adc_in[3]" G5;
 IO_PORT "adc_in[3]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[2]" T14;
+IO_LOC "adc_in[2]" F5;
 IO_PORT "adc_in[2]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[1]" R12;
+IO_LOC "adc_in[1]" G8;
 IO_PORT "adc_in[1]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "adc_in[0]" P13;
+IO_LOC "adc_in[0]" G7;
 IO_PORT "adc_in[0]" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "spi_cs" G11;
+IO_LOC "spi_cs" F7;
 IO_PORT "spi_cs" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "spi_mosi" H13;
+IO_LOC "spi_mosi" K8;
 IO_PORT "spi_mosi" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "spi_sck" H12;
+IO_LOC "spi_sck" F6;
 IO_PORT "spi_sck" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
-IO_LOC "clk_27M" H11;
-IO_PORT "clk_27M" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;
+IO_LOC "clk_50M" E2;
+IO_PORT "clk_50M" IO_TYPE=LVCMOS33 PULL_MODE=NONE BANK_VCCIO=3.3;

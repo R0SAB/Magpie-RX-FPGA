@@ -1,6 +1,6 @@
 module top
 (
-	input wire clk_27M,
+	input wire clk_50M,
 	
 	input wire spi_sck,
 	input wire spi_mosi,
@@ -30,7 +30,7 @@ wire clk_70M;
 
 reg [31:0]startup_delay;
 
-always @ (posedge clk_27M)
+always @ (posedge clk_50M)
 begin
     if(startup_delay < 27000000) startup_delay <= startup_delay + 1;
 end
@@ -303,15 +303,15 @@ inst_spdif
 
 wire ss_clk_H;
 
-Gowin_rPLL inst_ss_pll          // 199.8 MHz
+mcu_ss_pll your_instance_name
 (
-        .clkout(ss_clk_H),
-        .clkin(clk_27M)
+    .clkout0(ss_clk_H),
+    .clkin(clk_50M)
 );
 
 mcu_ss_generator inst_mcu_ss
 (
-    .clk_H(ss_clk_H),           // 199.8 MHz
+    .clk_H(ss_clk_H),           // 200 MHz
     .ss_clk_out(mcu_ss_clk)       // 8 MHz + 1/32
 );
 

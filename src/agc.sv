@@ -49,7 +49,7 @@ begin
 end
 
 
-reg signed [35:0]multiplier /* synthesis syn_dspstyle = "logic" */;
+reg signed [35:0]multiplier;
 
 reg [15:0]carrier_present_mm;
 localparam CARRIER_DELAY = 10000;
@@ -88,8 +88,6 @@ begin
         else carrier_present_out <= 0;
 
     end
-
-    if(clk_44k_eg == 2'b10) multiplier <= gain * audio_in;
 
 end
 
