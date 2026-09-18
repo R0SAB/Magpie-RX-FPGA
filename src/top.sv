@@ -175,7 +175,8 @@ lo_sync inst_lo_sync
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),
     .sync_car_cos(sync_car_cos),
-    .sync_car_sin(sync_car_sin)    
+    .sync_car_sin(sync_car_sin),
+    .lock_out(status_sync_lock)
 );
 
 // ########################## SYNC AM DEMOD ##########################
@@ -222,7 +223,7 @@ agc inst_agc
     .clk_44k(clk_44k),
     .clk_70M(clk_70M),
     .mode((modulation == MOD_AM) ? 1 : 0),
-    .carrier_present_out(status_sync_lock)
+    .am_squelch(status_sync_lock)           // Good signal: 1
 );
 
 

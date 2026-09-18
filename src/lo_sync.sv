@@ -5,7 +5,8 @@ module lo_sync
     input wire clk_44k,
     input wire clk_70M,
     output wire signed [23:0]sync_car_cos,
-    output wire signed [23:0]sync_car_sin    
+    output wire signed [23:0]sync_car_sin,
+    output reg lock_out  
 );
 
 
@@ -69,10 +70,14 @@ wire signed [1+16+FREQ_TAU_BITS:0]itgr_next;
 assign itgr_next = itgr + freq_diff - phase_correction;
 
 logic signed [23:0]phase_correction;
+logic phase_good;
 
 always_comb
 begin
-    if(phase_diff > -(1 <<< 22) && phase_diff < (1 <<< 22)) phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS-3);
+    if(phase_diff > -(1 <<< 22) && phase_diff < (1 <<< 22)) phase_good = 0;
+    else phase_good = 1;
+
+    if(~phase_good) phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS-3);
     else phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS);
 end
 
@@ -111,6 +116,21 @@ inst_cordic_sync
     .sin_out(sync_car_sin),
     .cos_out(sync_car_cos)
 );
+
+
+logic [15:0]lock_mm;
+localparam LOCK_MM_END = 5000;
+
+always @ (posedge clk_44k)
+begin
+    if(~phase_good) lock_mm <= 0;
+    else
+    if(lock_mm < LOCK_MM_END) lock_mm <= lock_mm + 1;
+
+    if(lock_mm == LOCK_MM_END) lock_out <= 1;
+    else lock_out <= 0;
+end
+
 
 
 
