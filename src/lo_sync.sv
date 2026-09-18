@@ -17,6 +17,11 @@ wire signed [23:0]narrow_I;
 wire signed [23:0]narrow_Q;
 wire signed [23:0]phase_ref;
 
+wire signed [23:0]in_I_round;
+wire signed [23:0]in_Q_round;
+assign in_I_round = in_I + (1 <<< 5);
+assign in_Q_round = in_Q + (1 <<< 5);
+
 fir
 #(
 	.ORDER(510),
@@ -31,8 +36,8 @@ inst_fir_narrow
 (
 	.clk_H(clk_70M),
 	.samp_clk(clk_44k),
-	.in_1(in_I[23:6]),
-	.in_2(in_Q[23:6]),
+	.in_1(in_I_round[23:6]),
+	.in_2(in_Q_round[23:6]),
     .out_1(narrow_I),
 	.out_2(narrow_Q)
 );

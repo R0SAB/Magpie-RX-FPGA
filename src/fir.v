@@ -110,8 +110,8 @@ begin
 
 	if(samp_clk_eg == 2'b01)													// Accumulator operation and output sample
 	begin
-		round_1 <= acc_1 + (1<<<(TAPS_MSB+GAIN_BITS-OUT_MSB-2));
-		round_2 <= acc_2 + (1<<<(TAPS_MSB+GAIN_BITS-OUT_MSB-2));
+		round_1 <= acc_1 + (1<<<(IN_MSB+TAPS_MSB+GAIN_BITS-OUT_MSB-2));
+		round_2 <= acc_2 + (1<<<(IN_MSB+TAPS_MSB+GAIN_BITS-OUT_MSB-2));
 		out_1[OUT_MSB:0] <= round_1[IN_MSB+TAPS_MSB+GAIN_BITS-1 : IN_MSB+TAPS_MSB+GAIN_BITS-OUT_MSB-1];
 		out_2[OUT_MSB:0] <= round_2[IN_MSB+TAPS_MSB+GAIN_BITS-1 : IN_MSB+TAPS_MSB+GAIN_BITS-OUT_MSB-1];
 	end
