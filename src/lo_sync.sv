@@ -81,7 +81,7 @@ logic phase_good;
 logic signed [23:0]phase_ref_prev;
 logic signed [23:0]phase_ref_diff;
 assign phase_ref_diff = phase_ref - phase_ref_prev;
-reg [33:0]phase_ref_diff_itgr;
+reg signed [33:0]phase_ref_diff_itgr;
 wire signed [23:0]phase_ref_diff_itgr_out;
 assign phase_ref_diff_itgr_out = phase_ref_diff_itgr >>> 10;
 
