@@ -81,7 +81,12 @@ logic phase_good;
 logic signed [23:0]phase_ref_prev;
 logic signed [23:0]phase_ref_diff;
 assign phase_ref_diff = phase_ref - phase_ref_prev;
-assign iq_rot_dir = phase_ref_diff[23];
+reg [33:0]phase_ref_diff_itgr;
+wire signed [23:0]phase_ref_diff_itgr_out;
+assign phase_ref_diff_itgr_out = phase_ref_diff_itgr >>> 10;
+
+
+assign iq_rot_dir = phase_ref_diff_itgr[33];
 
 
 always_comb
@@ -107,6 +112,7 @@ begin
     phase_diff_prev <= phase_diff;
 
     phase_ref_prev <= phase_ref;
+    phase_ref_diff_itgr <= phase_ref_diff_itgr + phase_ref_diff - phase_ref_diff_itgr_out;
 
 end
 
