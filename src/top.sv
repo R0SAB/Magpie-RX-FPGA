@@ -50,6 +50,7 @@ wire [7:0]s_meter_value;
 
 wire status_ovr;
 wire status_sync_lock;
+wire status_iq_rot_dir;
 
 spi_interface inst_spi
 (
@@ -64,7 +65,7 @@ spi_interface inst_spi
     .volume_out(volume_5bit),
 
     .s_meter_value_in(s_meter_value),
-    .status_byte_in({6'b0, status_sync_lock, status_ovr})
+    .status_byte_in({5'b0, status_iq_rot_dir, status_sync_lock, status_ovr})
 );
 
 
@@ -176,7 +177,8 @@ lo_sync inst_lo_sync
     .clk_70M(clk_70M),
     .sync_car_cos(sync_car_cos),
     .sync_car_sin(sync_car_sin),
-    .lock_out(status_sync_lock)
+    .lock_out(status_sync_lock),
+    .iq_rot_dir(status_iq_rot_dir)
 );
 
 // ########################## SYNC AM DEMOD ##########################

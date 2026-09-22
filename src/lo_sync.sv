@@ -6,7 +6,8 @@ module lo_sync
     input wire clk_70M,
     output wire signed [23:0]sync_car_cos,
     output wire signed [23:0]sync_car_sin,
-    output reg lock_out  
+    output reg lock_out,
+    output wire iq_rot_dir
 );
 
 
@@ -77,6 +78,12 @@ assign itgr_next = itgr + freq_diff - phase_correction;
 logic signed [23:0]phase_correction;
 logic phase_good;
 
+logic signed [23:0]phase_ref_prev;
+logic signed [23:0]phase_ref_diff;
+assign phase_ref_diff = phase_ref - phase_ref_prev;
+assign iq_rot_dir = phase_ref_diff[23];
+
+
 always_comb
 begin
     if(phase_diff > -(1 <<< 22) && phase_diff < (1 <<< 22)) phase_good = 0;
@@ -98,6 +105,8 @@ begin
     itgr <= itgr_next;
 
     phase_diff_prev <= phase_diff;
+
+    phase_ref_prev <= phase_ref;
 
 end
 
