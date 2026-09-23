@@ -1,3 +1,4 @@
+
 module agc
 (
     input  wire signed [23:0] audio_in,
@@ -6,10 +7,8 @@ module agc
     input wire clk_44k,
     input wire clk_70M,
 
-    input wire mode,       // 0 - qPeak; 1 - Mean
-    input wire am_squelch,
-
-    output reg carrier_present_out
+    input wire mode,
+    input wire am_squelch
 );
 
 
@@ -17,6 +16,7 @@ module agc
 
 localparam integer GAIN_TAU_BITS  = 10;
 localparam integer GAIN_FRAC_BITS = 18;
+localparam integer ATTACK_BITS    = 4;
 
 
 // Clock edge detector
@@ -27,7 +27,6 @@ reg [1:0] clk_44k_eg;
 // Signal detector
 
 reg signed [23:0] abs_out;
-reg signed [23:0] detector_qpeak;
 
 logic signed [23:0] target;
 
@@ -41,19 +40,28 @@ wire signed [19:0] gain;
 assign gain = gain_itgr >>> GAIN_TAU_BITS;
 
 
-// Maximum gain:
-// 524287 / 262144 = 1.999996
+// Maximum gain
 
-localparam signed [29:0] GAIN_MAX_ITGR =
+localparam signed [19+GAIN_TAU_BITS:0] GAIN_MAX_ITGR =
     30'sd524287 <<< GAIN_TAU_BITS;
 
 
-// Extended integrator calculation
+// Gain error
+
+wire signed [31:0] error;
+
+assign error = target - abs_out;
+
+
+// Asymmetric gain integrator
 
 wire signed [31:0] gain_itgr_next;
 
 assign gain_itgr_next =
-    gain_itgr + target - detector_qpeak;
+    gain_itgr +
+    ((error < 0) ?
+        (error <<< ATTACK_BITS) :
+        error);
 
 
 // Target level
@@ -63,15 +71,22 @@ begin
     if (mode == 1'b0)
         target = 24'sd5000;
     else if (am_squelch)
-        target = 24'sd10000;
+        target = 24'sd12000;
     else
-        target = 24'sd2000;
+        target = 24'sd3000;
 end
 
 
 // 20 x 24 = 44 bits
 
 reg signed [43:0] multiplier;
+
+
+// Scaled audio
+
+wire signed [43:0] scaled_audio;
+
+assign scaled_audio = multiplier >>> GAIN_FRAC_BITS;
 
 
 always @(posedge clk_70M)
@@ -92,16 +107,6 @@ begin
             abs_out <= audio_out;
 
 
-        // Quasi-peak detector
-
-        if (detector_qpeak < abs_out)
-            detector_qpeak <= abs_out;
-        else
-            detector_qpeak <=
-                detector_qpeak -
-                (detector_qpeak >>> 7);
-
-
         // Gain integrator with saturation
 
         if (gain_itgr_next < 0)
@@ -119,19 +124,16 @@ begin
         multiplier <= gain * audio_in;
 
 
-        // Output saturation, Q2.18
+        // Output saturation
 
-        if (multiplier[43:42] != {2{multiplier[41]}})
-        begin
-            if (multiplier[43])
-                audio_out <= 24'sh800000;
-            else
-                audio_out <= 24'sh7FFFFF;
-        end
+        if (scaled_audio > 44'sd8388607)
+            audio_out <= 24'sh7FFFFF;
+
+        else if (scaled_audio < -44'sd8388608)
+            audio_out <= 24'sh800000;
+
         else
-        begin
-            audio_out <= multiplier[41:18];
-        end
+            audio_out <= scaled_audio[23:0];
 
     end
 
