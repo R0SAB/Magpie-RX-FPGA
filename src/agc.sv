@@ -73,7 +73,7 @@ begin
     else if (am_squelch)
         target = 24'sd12000;
     else
-        target = 24'sd3000;
+        target = 24'sd2000;
 end
 
 
