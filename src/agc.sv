@@ -17,7 +17,7 @@ module agc
 // --------------------------------------------------
 
 localparam integer GAIN_TAU_BITS  = 10;
-localparam integer GAIN_FRAC_BITS = 18;
+localparam integer GAIN_FRAC_BITS = 16;
 localparam integer ATTACK_BITS    = 4;
 
 localparam integer AUDIO_DELAY    = 1024;
