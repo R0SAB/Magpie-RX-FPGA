@@ -65,7 +65,9 @@ spi_interface inst_spi
     .volume_out(volume_5bit),
 
     .s_meter_value_in(s_meter_value),
-    .status_byte_in({5'b0, status_iq_rot_dir, status_sync_lock, status_ovr})
+    .status_byte_in({5'b0, status_iq_rot_dir, status_sync_lock, status_ovr}),
+
+    .clk_70M(clk_70M)
 );
 
 
