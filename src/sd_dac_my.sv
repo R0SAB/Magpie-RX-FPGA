@@ -1,25 +1,31 @@
 module sd_dac_my
 (
-    input wire signed [15:0]in,
-    output wire out,
-    input wire clk
+    input  logic               clk,
+    input  logic signed [15:0] in,
+    output logic               out
 );
 
+    logic [15:0] acc;
+    logic [15:0] in_unsigned;
+    logic [16:0] sum;
 
-localparam TAU_BITS = 8;
+    // Signed PCM -> unsigned offset binary:
+    // -32768 ->     0
+    //      0 -> 32768
+    // +32767 -> 65535
+    assign in_unsigned = {~in[15], in[14:0]};
 
-reg signed [15+TAU_BITS:0]itgr;
-assign out = itgr[15+TAU_BITS];
-wire signed [15:0]level;
-assign level = out ? 32767 : -32768;
+    // 17-bit addition is important: bit 16 is the DAC output.
+    assign sum = {1'b0, acc} + {1'b0, in_unsigned};
 
+    always_ff @(posedge clk) begin
+        acc <= sum[15:0];
+        out <= sum[16];
+    end
 
-always @ (posedge clk)
-begin
-
-    itgr <= itgr + in - level;
-
-end
-
+    initial begin
+        acc = 16'd0;
+        out = 1'b0;
+    end
 
 endmodule
