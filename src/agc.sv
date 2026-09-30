@@ -105,10 +105,10 @@ begin
         target = 24'sd5000;
 
     else if (am_squelch)
-        target = 24'sd10000;
+        target = 24'sd15000;
 
     else
-        target = 24'sd2000;
+        target = 24'sd2800;
 
 end
 
