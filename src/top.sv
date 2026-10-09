@@ -280,11 +280,18 @@ volume_control inst_volume
     .clk_44k(clk_44k)
 );
 
+wire signed [15:0]depop_bias_out;
+
+depop inst_depop
+(
+    .clk_44k(clk_44k),
+    .bias_out(depop_bias_out)
+);
 
 sd_dac_my inst_audio_dac
 (
     .clk(clk_70M),
-    .in(volume_audio_out),
+    .in(volume_audio_out - depop_bias_out),
     .out(sd_dac_out)
 );
 
