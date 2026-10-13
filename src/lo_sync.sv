@@ -139,7 +139,7 @@ inst_cordic_sync
 
 
 logic [15:0]lock_mm;
-localparam LOCK_MM_END = 5000;
+localparam LOCK_MM_END = 2000;
 
 always @ (posedge clk_44k)
 begin
