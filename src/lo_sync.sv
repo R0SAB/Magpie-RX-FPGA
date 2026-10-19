@@ -138,12 +138,24 @@ inst_cordic_sync
 );
 
 
+localparam LOCK_TAU_BITS = 14;
+
+logic [7:0]lock_probability;
+logic [7+LOCK_TAU_BITS:0]probability_itgr;
+assign lock_probability = probability_itgr >>> LOCK_TAU_BITS;
+
+always @ (posedge clk_44k)
+begin
+    probability_itgr <= probability_itgr + (phase_good ? 255 : '0) - lock_probability;
+end
+
+
 logic [15:0]lock_mm;
 localparam LOCK_MM_END = 2000;
 
 always @ (posedge clk_44k)
 begin
-    if(~phase_good) lock_mm <= 0;
+    if(/*~phase_good*/lock_probability < 200) lock_mm <= 0;
     else
     if(lock_mm < LOCK_MM_END) lock_mm <= lock_mm + 1;
 
