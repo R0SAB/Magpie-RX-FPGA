@@ -73,7 +73,7 @@ wire signed [23:0]freq_diff;
 assign freq_diff = phase_diff - phase_diff_prev;
 
 wire signed [1+16+FREQ_TAU_BITS:0]itgr_next;
-assign itgr_next = itgr + freq_diff - phase_correction;
+assign itgr_next = itgr + freq_diff + phase_correction;
 
 logic signed [23:0]phase_correction;
 logic phase_good;
@@ -91,8 +91,8 @@ assign iq_rot_dir = phase_ref_diff_itgr[33];
 
 always_comb
 begin
-    if(phase_diff > -(1 <<< 22) && phase_diff < (1 <<< 22)) phase_good = 0;
-    else phase_good = 1;
+    if(phase_diff > -(1 <<< 22) && phase_diff < (1 <<< 22)) phase_good = 1;
+    else phase_good = 0;
 
     if(~phase_good) phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS-3);
     else phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS);
