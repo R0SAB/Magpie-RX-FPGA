@@ -11,8 +11,8 @@ module lo_sync
 );
 
 
-localparam FREQ_TAU_BITS = 12;
-localparam PHASE_INJECT_BITS = 8;
+localparam FREQ_TAU_BITS = 11;
+localparam PHASE_INJECT_BITS = 12;
 
 wire signed [23:0]narrow_I;
 wire signed [23:0]narrow_Q;
@@ -94,8 +94,8 @@ begin
     if(phase_diff > -(1 <<< 22) && phase_diff < (1 <<< 22)) phase_good = 1;
     else phase_good = 0;
 
-    if(~phase_good) phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS-3);
-    else phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS);
+    //if(~phase_good) phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS-3);
+    /*else*/ phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS);
 end
 
 always @ (posedge clk_44k)
@@ -155,12 +155,12 @@ localparam LOCK_MM_END = 2000;
 
 always @ (posedge clk_44k)
 begin
-    if(/*~phase_good*/lock_probability < 200) lock_mm <= 0;
+    if(/*~phase_good*/lock_probability > 160) lock_mm <= 0;
     else
     if(lock_mm < LOCK_MM_END) lock_mm <= lock_mm + 1;
 
-    if(lock_mm == LOCK_MM_END) lock_out <= 1;
-    else lock_out <= 0;
+    if(lock_mm == LOCK_MM_END) lock_out <= 0;
+    else lock_out <= 1;
 end
 
 
