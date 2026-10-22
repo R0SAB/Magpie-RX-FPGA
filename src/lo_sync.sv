@@ -94,8 +94,8 @@ begin
     if(phase_diff > -(1 <<< 22) && phase_diff < (1 <<< 22)) phase_good = 1;
     else phase_good = 0;
 
-    //if(~phase_good) phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS-3);
-    /*else*/ phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS);
+    if(~phase_good) phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS-3);
+    else phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS);
 end
 
 always @ (posedge clk_44k)
