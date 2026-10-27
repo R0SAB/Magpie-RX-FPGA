@@ -5,7 +5,7 @@ module mcu_ss_generator
 );
 
 wire [19:0]f0;
-assign f0 = 20'd42000;  // 2^20/199.8M*8M
+assign f0 = 20'd37800;  // 2^20/199.8M*8M
 reg [19:0]ph_acc;
 reg [19:0]f;
 
