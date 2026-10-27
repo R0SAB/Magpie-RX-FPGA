@@ -16,7 +16,7 @@ module agc
 // Gain parameters
 // --------------------------------------------------
 
-localparam integer GAIN_TAU_BITS  = 10;
+localparam integer GAIN_TAU_BITS  = 9;
 localparam integer GAIN_FRAC_BITS = 16;
 localparam integer ATTACK_BITS    = 4;
 
