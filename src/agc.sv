@@ -136,13 +136,13 @@ always_comb
 begin
 
     if (mode == 1'b0)
-        target = 24'sd10000;
+        target = 24'sd7000;
 
     else if (am_squelch)
-        target = 24'sd30000;
+        target = 24'sd22000;
 
     else
-        target = 24'sd6000;
+        target = 24'sd4000;
 
 end
 
