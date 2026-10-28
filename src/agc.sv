@@ -89,7 +89,7 @@ assign error = target - abs_out;
 // Rise: about 64 ms per +6 dB at the rate limit.
 // Fall: about 16 ms per -6 dB at the rate limit.
 // These are MAXIMUM rates; the original error integrator may be slower.
-localparam integer GAIN_RISE_RATE_BITS = 12;
+localparam integer GAIN_RISE_RATE_BITS = 13;
 localparam integer GAIN_FALL_RATE_BITS = 7;
 
 // A floor for the RISE limiter only. Without it, starting from
@@ -136,13 +136,13 @@ always_comb
 begin
 
     if (mode == 1'b0)
-        target = 24'sd5000;
+        target = 24'sd10000;
 
     else if (am_squelch)
-        target = 24'sd15000;
+        target = 24'sd30000;
 
     else
-        target = 24'sd2800;
+        target = 24'sd6000;
 
 end
 
