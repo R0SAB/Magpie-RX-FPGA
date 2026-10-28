@@ -7,7 +7,7 @@ module agc
     input wire clk_44k,
     input wire clk_70M,
 
-    input wire mode,
+    input wire mode,            // 0 - SSB, 1 - AM
     input wire am_squelch
 );
 
@@ -43,23 +43,23 @@ reg [$clog2(HANG_SAMPLES+1)-1:0] hang_timer = '0;
 // Clock edge detector
 // --------------------------------------------------
 
-reg [1:0] clk_44k_eg;
+reg [1:0] clk_44k_eg = 2'b00;
 
 
 // --------------------------------------------------
 // Signal detector
 // --------------------------------------------------
 
-reg signed [23:0] abs_out;
+reg signed [23:0] abs_out = 24'sd0;
 
 logic signed [23:0] target;
 
 
 // --------------------------------------------------
-// 20-bit gain, 30-bit integrator
+// 20-bit gain, 29-bit signed integrator
 // --------------------------------------------------
 
-reg signed [19+GAIN_TAU_BITS:0] gain_itgr;
+reg signed [19+GAIN_TAU_BITS:0] gain_itgr = '0;
 
 wire signed [19:0] gain;
 
@@ -82,16 +82,50 @@ assign error = target - abs_out;
 
 
 // --------------------------------------------------
-// Asymmetric gain integrator
+// Gain slew-rate limits (applied to BOTH directions)
 // --------------------------------------------------
 
-wire signed [31:0] gain_itgr_next;
+// Maximum change relative to the current gain per 44.1 kHz sample.
+// Rise: about 64 ms per +6 dB at the rate limit.
+// Fall: about 16 ms per -6 dB at the rate limit.
+// These are MAXIMUM rates; the original error integrator may be slower.
+localparam integer GAIN_RISE_RATE_BITS = 12;
+localparam integer GAIN_FALL_RATE_BITS = 7;
 
-assign gain_itgr_next =
-    gain_itgr +
-    ((error < 0) ?
-        (error <<< ATTACK_BITS) :
-        error);
+// A floor for the RISE limiter only. Without it, starting from
+// gain_itgr == 0 would take extremely long. This is in gain units
+// (before the GAIN_TAU_BITS scaling), not audio sample units.
+localparam integer GAIN_RISE_REF_FLOOR = 256;
+localparam signed [19+GAIN_TAU_BITS:0] RISE_REF_FLOOR_ITGR =
+    GAIN_RISE_REF_FLOOR <<< GAIN_TAU_BITS;
+
+// Preserve the original SSB-only acceleration of gain reduction.
+wire signed [31:0] gain_step_raw = ((error < 0) /*&& (mode == 1'b0)*/) ? (error <<< ATTACK_BITS) : error;
+
+wire signed [19+GAIN_TAU_BITS:0] rise_reference =
+    (gain_itgr < RISE_REF_FLOOR_ITGR)
+        ? RISE_REF_FLOOR_ITGR : gain_itgr;
+
+wire signed [31:0] gain_step_up_max =
+    $signed(rise_reference) >>> GAIN_RISE_RATE_BITS;
+
+// The fall limiter uses the ACTUAL gain, without the rise floor.
+// This prevents an excessively large negative step at low gain.
+wire signed [31:0] gain_step_down_raw_max =
+    $signed(gain_itgr) >>> GAIN_FALL_RATE_BITS;
+
+wire signed [31:0] gain_step_down_max =
+    (gain_step_down_raw_max > 0)
+        ? gain_step_down_raw_max : 32'sd1;
+
+wire signed [31:0] gain_step_limited =
+    (gain_step_raw > gain_step_up_max) ? gain_step_up_max :
+    (gain_step_raw < -gain_step_down_max) ? -gain_step_down_max :
+    gain_step_raw;
+
+// All terms are signed and 32-bit, before the saturation checks.
+wire signed [31:0] gain_itgr_next =
+    $signed(gain_itgr) + gain_step_limited;
 
 
 // --------------------------------------------------
@@ -128,7 +162,7 @@ assign audio_delayed = audio_fifo[AUDIO_DELAY-1];
 // AGC control path
 // --------------------------------------------------
 
-reg signed [43:0] multiplier_agc;
+reg signed [43:0] multiplier_agc = 44'sd0;
 
 wire signed [43:0] scaled_audio_agc;
 
@@ -138,14 +172,14 @@ assign scaled_audio_agc =
 
 // Internal AGC audio output
 
-reg signed [23:0] audio_agc;
+reg signed [23:0] audio_agc = 24'sd0;
 
 
 // --------------------------------------------------
 // Delayed audio output path
 // --------------------------------------------------
 
-reg signed [43:0] multiplier_out;
+reg signed [43:0] multiplier_out = 44'sd0;
 
 wire signed [43:0] scaled_audio_out;
 
