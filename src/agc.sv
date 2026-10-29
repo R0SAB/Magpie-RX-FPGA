@@ -23,12 +23,16 @@ localparam integer ATTACK_BITS    = 4;
 localparam integer AUDIO_DELAY    = 1024;
 
 
+localparam TARGET_SSB = 6000;
+localparam TARGET_AM = 20000;
+localparam TARGET_AM_SQ = 3500;
+
 // --------------------------------------------------
 // Hang AGC parameters
 // --------------------------------------------------
 
 localparam integer AUDIO_SAMPLE_RATE = 44100;
-localparam integer HANG_TIME_MS      = 100;
+localparam integer HANG_TIME_MS      = 150;
 
 localparam integer HANG_SAMPLES =
     AUDIO_SAMPLE_RATE * HANG_TIME_MS / 1000;
@@ -90,7 +94,7 @@ assign error = target - abs_out;
 // Fall: about 16 ms per -6 dB at the rate limit.
 // These are MAXIMUM rates; the original error integrator may be slower.
 localparam integer GAIN_RISE_RATE_BITS = 13;
-localparam integer GAIN_FALL_RATE_BITS = 7;
+localparam integer GAIN_FALL_RATE_BITS = 9;
 
 // A floor for the RISE limiter only. Without it, starting from
 // gain_itgr == 0 would take extremely long. This is in gain units
@@ -136,13 +140,13 @@ always_comb
 begin
 
     if (mode == 1'b0)
-        target = 24'sd7000;
+        target = TARGET_SSB;
 
     else if (am_squelch)
-        target = 24'sd22000;
+        target = TARGET_AM;
 
     else
-        target = 24'sd4000;
+        target = TARGET_AM_SQ;
 
 end
 
