@@ -23,9 +23,9 @@ localparam integer ATTACK_BITS    = 4;
 localparam integer AUDIO_DELAY    = 1024;
 
 
-localparam TARGET_SSB = 6000;
-localparam TARGET_AM = 20000;
-localparam TARGET_AM_SQ = 3500;
+localparam TARGET_SSB = 3000;
+localparam TARGET_AM = 10000;
+localparam TARGET_AM_SQ = 2500;
 
 // --------------------------------------------------
 // Hang AGC parameters
