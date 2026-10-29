@@ -258,7 +258,7 @@ begin
         // Gain increase is allowed only when
         // the hang timer has expired.
 
-        if ((error < 0) || (hang_timer == 0))
+        if (/*(error < 0) || (hang_timer == 0)*/ 1)
         begin
 
             if (gain_itgr_next < 0)
