@@ -1,7 +1,6 @@
-
 module agc
 (
-    input wire signed [23:0]mag_in,
+    input wire signed [23:0] mag_in,
 
     input  wire signed [23:0] audio_in,
     output reg  signed [23:0] audio_out,
@@ -26,7 +25,7 @@ localparam integer AUDIO_DELAY    = 1024;
 
 
 localparam TARGET_SSB = 6000;
-localparam TARGET_AM = 13000;
+localparam TARGET_AM = 10000;
 localparam TARGET_AM_SQ = 2000;
 
 // --------------------------------------------------
@@ -34,7 +33,7 @@ localparam TARGET_AM_SQ = 2000;
 // --------------------------------------------------
 
 localparam integer AUDIO_SAMPLE_RATE = 44100;
-localparam integer HANG_TIME_MS      = 150;
+localparam integer HANG_TIME_MS      = 200;
 
 localparam integer HANG_SAMPLES =
     AUDIO_SAMPLE_RATE * HANG_TIME_MS / 1000;
@@ -62,7 +61,7 @@ logic signed [23:0] target;
 
 
 // --------------------------------------------------
-// 20-bit gain, 29-bit signed integrator
+// 20-bit gain, (20 + GAIN_TAU_BITS)-bit signed integrator
 // --------------------------------------------------
 
 reg signed [19+GAIN_TAU_BITS:0] gain_itgr = '0;
@@ -92,12 +91,13 @@ assign error = target - abs_out;
 // --------------------------------------------------
 
 // Maximum change relative to the current gain per 44.1 kHz sample.
-// Rise: about 64 ms per +6 dB at the rate limit.
-// Fall: about 16 ms per -6 dB at the rate limit.
+// Rise: about 64 ms per +6 dB normally, 1.03 s during SSB hang.
+// Fall: about 2 ms per -6 dB in SSB, 16 ms in AM.
+// Rise timing assumes gain above the rise reference floor.
 // These are MAXIMUM rates; the original error integrator may be slower.
 localparam integer GAIN_RISE_RATE_BITS = 12;
-//localparam integer GAIN_FALL_RATE_BITS = 7;
-wire [7:0]gain_fall_rate_bits = (mode == 0) ? 7 : 10;
+localparam integer GAIN_RISE_RATE_BITS_HANG = 16;
+wire [7:0] gain_fall_rate_bits = (mode == 0) ? 7 : 10;
 
 // A floor for the RISE limiter only. Without it, starting from
 // gain_itgr == 0 would take extremely long. This is in gain units
@@ -106,16 +106,25 @@ localparam integer GAIN_RISE_REF_FLOOR = 256;
 localparam signed [19+GAIN_TAU_BITS:0] RISE_REF_FLOOR_ITGR =
     GAIN_RISE_REF_FLOOR <<< GAIN_TAU_BITS;
 
-// Preserve the original SSB-only acceleration of gain reduction.
-wire signed [31:0] gain_step_raw = ((error < 0) /*&& (mode == 1'b0)*/) ? (error <<< ATTACK_BITS) : error;
-//wire signed [31:0] gain_step_raw = error;
+// Accelerate gain reduction in both SSB and AM.
+wire signed [31:0] gain_step_raw =
+    (error < 0) ? (error <<< ATTACK_BITS) : error;
 
 wire signed [19+GAIN_TAU_BITS:0] rise_reference =
     (gain_itgr < RISE_REF_FLOOR_ITGR)
         ? RISE_REF_FLOOR_ITGR : gain_itgr;
 
-wire signed [31:0] gain_step_up_max =
-    $signed(rise_reference) >>> GAIN_RISE_RATE_BITS;
+logic signed [31:0] gain_step_up_max;
+
+always_comb
+begin
+    gain_step_up_max =
+        $signed(rise_reference) >>> GAIN_RISE_RATE_BITS;
+
+    if ((mode == 1'b0) && (hang_timer != 0))
+        gain_step_up_max =
+            $signed(rise_reference) >>> GAIN_RISE_RATE_BITS_HANG;
+end
 
 // The fall limiter uses the ACTUAL gain, without the rise floor.
 // This prevents an excessively large negative step at low gain.
@@ -259,22 +268,17 @@ begin
         // ------------------------------------------
 
         // Gain reduction is always allowed.
-        // Gain increase is allowed only when
-        // the hang timer has expired.
+        // Gain increase is also always allowed, but its rate is reduced
+        // while the hang timer is active in SSB.
 
-        if ((error < 0) || (hang_timer == 0) || (mode == 1))
-        begin
+        if (gain_itgr_next < 0)
+            gain_itgr <= 0;
 
-            if (gain_itgr_next < 0)
-                gain_itgr <= 0;
+        else if (gain_itgr_next > GAIN_MAX_ITGR)
+            gain_itgr <= GAIN_MAX_ITGR;
 
-            else if (gain_itgr_next > GAIN_MAX_ITGR)
-                gain_itgr <= GAIN_MAX_ITGR;
-
-            else
-                gain_itgr <= gain_itgr_next;
-
-        end
+        else
+            gain_itgr <= gain_itgr_next;
 
 
         // ------------------------------------------
