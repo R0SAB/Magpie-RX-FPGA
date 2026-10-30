@@ -1,6 +1,8 @@
 
 module agc
 (
+    input wire signed [23:0]mag_in,
+
     input  wire signed [23:0] audio_in,
     output reg  signed [23:0] audio_out,
 
@@ -18,14 +20,14 @@ module agc
 
 localparam integer GAIN_TAU_BITS  = 8;
 localparam integer GAIN_FRAC_BITS = 16;
-localparam integer ATTACK_BITS    = 4;
+localparam integer ATTACK_BITS    = 3;
 
 localparam integer AUDIO_DELAY    = 1024;
 
 
-localparam TARGET_SSB = 3000;
-localparam TARGET_AM = 10000;
-localparam TARGET_AM_SQ = 2500;
+localparam TARGET_SSB = 8000;
+localparam TARGET_AM = 13000;
+localparam TARGET_AM_SQ = 2000;
 
 // --------------------------------------------------
 // Hang AGC parameters
@@ -93,8 +95,9 @@ assign error = target - abs_out;
 // Rise: about 64 ms per +6 dB at the rate limit.
 // Fall: about 16 ms per -6 dB at the rate limit.
 // These are MAXIMUM rates; the original error integrator may be slower.
-localparam integer GAIN_RISE_RATE_BITS = 13;
-localparam integer GAIN_FALL_RATE_BITS = 9;
+localparam integer GAIN_RISE_RATE_BITS = 12;
+//localparam integer GAIN_FALL_RATE_BITS = 7;
+wire [7:0]gain_fall_rate_bits = (mode == 0) ? 7 : 10;
 
 // A floor for the RISE limiter only. Without it, starting from
 // gain_itgr == 0 would take extremely long. This is in gain units
@@ -104,7 +107,8 @@ localparam signed [19+GAIN_TAU_BITS:0] RISE_REF_FLOOR_ITGR =
     GAIN_RISE_REF_FLOOR <<< GAIN_TAU_BITS;
 
 // Preserve the original SSB-only acceleration of gain reduction.
-wire signed [31:0] gain_step_raw = ((error < 0) /*&& (mode == 1'b0)*/) ? (error <<< ATTACK_BITS) : error;
+wire signed [31:0] gain_step_raw = ((error < 0) && (mode == 1'b0)) ? (error <<< ATTACK_BITS) : error;
+//wire signed [31:0] gain_step_raw = error;
 
 wire signed [19+GAIN_TAU_BITS:0] rise_reference =
     (gain_itgr < RISE_REF_FLOOR_ITGR)
@@ -116,7 +120,7 @@ wire signed [31:0] gain_step_up_max =
 // The fall limiter uses the ACTUAL gain, without the rise floor.
 // This prevents an excessively large negative step at low gain.
 wire signed [31:0] gain_step_down_raw_max =
-    $signed(gain_itgr) >>> GAIN_FALL_RATE_BITS;
+    $signed(gain_itgr) >>> gain_fall_rate_bits;
 
 wire signed [31:0] gain_step_down_max =
     (gain_step_down_raw_max > 0)
@@ -258,7 +262,7 @@ begin
         // Gain increase is allowed only when
         // the hang timer has expired.
 
-        if (/*(error < 0) || (hang_timer == 0)*/ 1)
+        if ((error < 0) || (hang_timer == 0) || (mode == 1))
         begin
 
             if (gain_itgr_next < 0)
@@ -277,7 +281,7 @@ begin
         // AGC control path
         // ------------------------------------------
 
-        multiplier_agc <= gain * audio_in;
+        multiplier_agc <= gain * mag_in;
 
 
         // Internal audio saturation

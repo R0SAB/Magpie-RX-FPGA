@@ -198,6 +198,31 @@ sync_am_demod inst_sync_am_demod
 );
 
 
+// ########################## MAGNITUDE CORDIC (FOR AGC) ############################
+
+wire unsigned [24:0]magnitude;
+wire signed [23:0]mag_signed;
+assign mag_signed[23] = 0;
+assign mag_signed[22:0] = magnitude[23:1];
+
+cordic_fullser_angmag
+#(
+    .STAGES(24),                       
+    .ANG_MSB(23),                 
+    .IN_MSB(23)                   
+)
+inst_cordic_agc
+(
+    .sin_in(bw_Q_out),
+    .cos_in(bw_I_out),
+    .ang_out(),
+    .mag_out(magnitude),
+    .samp_clk(clk_44k),
+    .clk_H(clk_70M)
+);
+
+
+
 // ######################### MOD SWITCH ############################
 
 reg [23:0]mod_switch_out;
@@ -222,6 +247,7 @@ wire signed [23:0]agc_out;
 
 agc inst_agc
 (
+    .mag_in((modulation == MOD_AM) ? mag_signed : ssb_demod_out),
     .audio_in(mod_switch_out),
     .audio_out(agc_out),
     .clk_44k(clk_44k),
