@@ -179,8 +179,7 @@ lo_sync inst_lo_sync
     .sync_car_cos(sync_car_cos),
     .sync_car_sin(sync_car_sin),
     .lock_out(status_sync_lock),
-    .iq_rot_dir(status_iq_rot_dir),
-    .squelch_ratio_out(squelch_ratio)
+    .iq_rot_dir(status_iq_rot_dir)
 );
 
 // ########################## SYNC AM DEMOD ##########################
@@ -248,7 +247,6 @@ wire signed [23:0]agc_out;
 agc inst_agc
 (
     .mag_in((modulation == MOD_AM) ? mag_signed : ssb_demod_out),
-    .squelch_ratio_in(squelch_ratio),
     .audio_in(mod_switch_out),
     .audio_out(agc_out),
     .clk_44k(clk_44k),

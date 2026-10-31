@@ -1,7 +1,6 @@
 module agc
 (
     input wire signed [23:0] mag_in,
-    input wire [7:0]squelch_ratio_in,
 
     input  wire signed [23:0] audio_in,
     output reg  signed [23:0] audio_out,
@@ -28,7 +27,6 @@ localparam integer AUDIO_DELAY    = 1024;
 localparam TARGET_SSB = 6000;
 localparam TARGET_AM = 9000;
 localparam TARGET_AM_SQ = 2000;
-wire [23:0]target_am = TARGET_AM_SQ + (squelch_ratio_in <<< 5);
 
 // --------------------------------------------------
 // Hang AGC parameters
@@ -153,7 +151,7 @@ wire signed [31:0] gain_itgr_next =
 
 always_comb
 begin
-/*
+
     if (mode == 1'b0)
         target = TARGET_SSB;
 
@@ -162,12 +160,6 @@ begin
 
     else
         target = TARGET_AM_SQ;
-*/
-
-    if (mode == 1'b0)
-        target = TARGET_SSB;
-
-    else target = target_am;
 
 end
 
