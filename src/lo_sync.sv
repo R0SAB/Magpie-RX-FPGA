@@ -7,7 +7,8 @@ module lo_sync
     output wire signed [23:0]sync_car_cos,
     output wire signed [23:0]sync_car_sin,
     output reg lock_out,
-    output wire iq_rot_dir
+    output wire iq_rot_dir,
+    output wire [7:0]squelch_ratio_out
 );
 
 
@@ -77,6 +78,7 @@ assign itgr_next = itgr + freq_diff + phase_correction;
 
 logic signed [23:0]phase_correction;
 logic phase_good;
+logic squelch_good;
 
 logic signed [23:0]phase_ref_prev;
 logic signed [23:0]phase_ref_diff;
@@ -91,8 +93,13 @@ assign iq_rot_dir = phase_ref_diff_itgr[33];
 
 always_comb
 begin
-    if(phase_diff > -(1 <<< 22) && phase_diff < (1 <<< 22)) phase_good = 1;
-    else phase_good = 0;
+    //if(phase_diff > -(1 <<< 22) && phase_diff < (1 <<< 22)) phase_good = 1;
+    //else phase_good = 0;
+
+    phase_good = 1;
+
+    if(phase_diff > -(1 <<< 18) && phase_diff < (1 <<< 18)) squelch_good = 1;
+    else squelch_good = 0;
 
     if(~phase_good) phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS-3);
     else phase_correction = phase_diff >>> (24-PHASE_INJECT_BITS);
@@ -138,15 +145,18 @@ inst_cordic_sync
 );
 
 
-localparam LOCK_TAU_BITS = 14;
+localparam LOCK_TAU_BITS = 12;
 
-logic [7:0]lock_probability;
+logic [7:0]squelch_probability;
 logic [7+LOCK_TAU_BITS:0]probability_itgr;
-assign lock_probability = probability_itgr >>> LOCK_TAU_BITS;
+assign squelch_probability = probability_itgr >>> LOCK_TAU_BITS;
+logic signed [8:0]squelch_clip;
+assign squelch_clip = squelch_probability - 16;
+assign squelch_ratio_out = (squelch_clip > 0) ? squelch_clip[7:0] : 0;
 
 always @ (posedge clk_44k)
 begin
-    probability_itgr <= probability_itgr + (phase_good ? 255 : '0) - lock_probability;
+    probability_itgr <= probability_itgr + (squelch_good ? 255 : '0) - squelch_probability;
 end
 
 
@@ -155,7 +165,7 @@ localparam LOCK_MM_END = 2000;
 
 always @ (posedge clk_44k)
 begin
-    if(/*~phase_good*/lock_probability > 160) lock_mm <= 0;
+    if(/*~phase_good*/squelch_probability > 16) lock_mm <= 0;
     else
     if(lock_mm < LOCK_MM_END) lock_mm <= lock_mm + 1;
 
