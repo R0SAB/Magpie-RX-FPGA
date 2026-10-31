@@ -170,7 +170,6 @@ ssb_demod inst_ssb_demod
 wire signed [23:0]sync_car_cos;
 wire signed [23:0]sync_car_sin;
 
-
 lo_sync inst_lo_sync
 (
     .in_I(downsamp_I),

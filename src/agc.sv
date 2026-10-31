@@ -25,7 +25,7 @@ localparam integer AUDIO_DELAY    = 1024;
 
 
 localparam TARGET_SSB = 6000;
-localparam TARGET_AM = 10000;
+localparam TARGET_AM = 9000;
 localparam TARGET_AM_SQ = 2000;
 
 // --------------------------------------------------
@@ -107,8 +107,7 @@ localparam signed [19+GAIN_TAU_BITS:0] RISE_REF_FLOOR_ITGR =
     GAIN_RISE_REF_FLOOR <<< GAIN_TAU_BITS;
 
 // Accelerate gain reduction in both SSB and AM.
-wire signed [31:0] gain_step_raw =
-    (error < 0) ? (error <<< ATTACK_BITS) : error;
+wire signed [31:0] gain_step_raw = (error < 0 && mode == 0) ? (error <<< ATTACK_BITS) : error;
 
 wire signed [19+GAIN_TAU_BITS:0] rise_reference =
     (gain_itgr < RISE_REF_FLOOR_ITGR)

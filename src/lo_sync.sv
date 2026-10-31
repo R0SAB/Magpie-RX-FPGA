@@ -138,7 +138,7 @@ inst_cordic_sync
 );
 
 
-localparam LOCK_TAU_BITS = 14;
+localparam LOCK_TAU_BITS = 15;
 
 logic [7:0]lock_probability;
 logic [7+LOCK_TAU_BITS:0]probability_itgr;
