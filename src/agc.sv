@@ -1,7 +1,5 @@
 module agc
 (
-    input wire signed [23:0] mag_in,
-
     input  wire signed [23:0] audio_in,
     output reg  signed [23:0] audio_out,
 
@@ -21,11 +19,14 @@ localparam integer GAIN_TAU_BITS  = 8;
 localparam integer GAIN_FRAC_BITS = 16;
 localparam integer ATTACK_BITS    = 3;
 
+// DC time constant: 2^12 / 44100 = approximately 92.9 ms.
+localparam integer DC_TAU_BITS    = 7;
+
 localparam integer AUDIO_DELAY    = 1024;
 
 
 localparam TARGET_SSB = 6000;
-localparam TARGET_AM = 9000;
+localparam TARGET_AM = 3000;
 localparam TARGET_AM_SQ = 2000;
 
 // --------------------------------------------------
@@ -92,7 +93,7 @@ assign error = target - abs_out;
 
 // Maximum change relative to the current gain per 44.1 kHz sample.
 // Rise: about 64 ms per +6 dB normally, 1.03 s during SSB hang.
-// Fall: about 2 ms per -6 dB in SSB, 16 ms in AM.
+// Fall: about 2 ms per -6 dB in SSB, 8 ms in AM.
 // Rise timing assumes gain above the rise reference floor.
 // These are MAXIMUM rates; the original error integrator may be slower.
 localparam integer GAIN_RISE_RATE_BITS = 12;
@@ -106,8 +107,7 @@ localparam integer GAIN_RISE_REF_FLOOR = 256;
 localparam signed [19+GAIN_TAU_BITS:0] RISE_REF_FLOOR_ITGR =
     GAIN_RISE_REF_FLOOR <<< GAIN_TAU_BITS;
 
-// Accelerate gain reduction in both SSB and AM.
-wire signed [31:0] gain_step_raw = (error < 0 && mode == 0) ? (error <<< ATTACK_BITS) : error;
+// Accelerate gain reduction in SSB.
 wire signed [31:0] gain_step_raw = (error < 0 && mode == 0) ? (error <<< ATTACK_BITS) : error;
 
 wire signed [19+GAIN_TAU_BITS:0] rise_reference =
@@ -191,6 +191,38 @@ assign scaled_audio_agc =
 
 reg signed [23:0] audio_agc = 24'sd0;
 
+// --------------------------------------------------
+// Combined AC/DC level detector (both modes)
+// --------------------------------------------------
+
+// Fractional accumulator: DC = dc_itgr / 2^DC_TAU_BITS.
+// Updated once per audio sample, like the existing integrators.
+reg signed [23+DC_TAU_BITS:0] dc_itgr = '0;
+wire signed [23:0] dc_level;
+assign dc_level = dc_itgr >>> DC_TAU_BITS;
+
+wire signed [23+DC_TAU_BITS:0] audio_dc_ext;
+wire signed [23+DC_TAU_BITS:0] dc_level_ext;
+assign audio_dc_ext = {{DC_TAU_BITS{audio_agc[23]}}, audio_agc};
+assign dc_level_ext = {{DC_TAU_BITS{dc_level[23]}}, dc_level};
+
+// Subtract in 25 bits: opposite full-scale values must not wrap.
+wire signed [24:0] ac_level;
+wire signed [24:0] dc_level_wide;
+assign dc_level_wide = {dc_level[23], dc_level};
+assign ac_level = $signed({audio_agc[23], audio_agc}) - dc_level_wide;
+
+// Unsigned magnitudes also represent abs(-2^23) correctly.
+wire [24:0] ac_abs;
+wire [24:0] dc_abs;
+wire [24:0] dc_abs_scaled;
+wire [24:0] combined_level;
+assign ac_abs = ac_level[24] ? $unsigned(-ac_level) : $unsigned(ac_level);
+assign dc_abs = dc_level_wide[24]
+    ? $unsigned(-dc_level_wide) : $unsigned(dc_level_wide);
+assign dc_abs_scaled = dc_abs >> 2;
+assign combined_level = (ac_abs > dc_abs_scaled) ? ac_abs : dc_abs_scaled;
+
 
 // --------------------------------------------------
 // Delayed audio output path
@@ -234,14 +266,13 @@ begin
         // AGC signal detector
         // ------------------------------------------
 
-        if (audio_agc == 24'sh800000)
+        dc_itgr <= dc_itgr + audio_dc_ext - dc_level_ext;
+
+        // Preserve the positive range of the signed feedback signal.
+        if (combined_level > 25'd8388607)
             abs_out <= 24'sh7FFFFF;
-
-        else if (audio_agc[23])
-            abs_out <= -audio_agc;
-
         else
-            abs_out <= audio_agc;
+            abs_out <= combined_level[23:0];
 
 
         // ------------------------------------------
@@ -285,7 +316,7 @@ begin
         // AGC control path
         // ------------------------------------------
 
-        multiplier_agc <= gain * mag_in;
+        multiplier_agc <= gain * audio_in;
 
 
         // Internal audio saturation
