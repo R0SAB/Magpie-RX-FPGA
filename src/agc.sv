@@ -97,8 +97,9 @@ assign error = target - abs_out;
 // Rise timing assumes gain above the rise reference floor.
 // These are MAXIMUM rates; the original error integrator may be slower.
 localparam integer GAIN_RISE_RATE_BITS = 12;
+wire [7:0] gain_rise_rate_bits = (mode == 0) ? 12 : 8;
 localparam integer GAIN_RISE_RATE_BITS_HANG = 16;
-wire [7:0] gain_fall_rate_bits = (mode == 0) ? 7 : 10;
+wire [7:0] gain_fall_rate_bits = (mode == 0) ? 7 : 8;
 
 // A floor for the RISE limiter only. Without it, starting from
 // gain_itgr == 0 would take extremely long. This is in gain units
@@ -119,7 +120,7 @@ logic signed [31:0] gain_step_up_max;
 always_comb
 begin
     gain_step_up_max =
-        $signed(rise_reference) >>> GAIN_RISE_RATE_BITS;
+        $signed(rise_reference) >>> gain_rise_rate_bits;
 
     if ((mode == 1'b0) && (hang_timer != 0))
         gain_step_up_max =
@@ -220,7 +221,7 @@ wire [24:0] combined_level;
 assign ac_abs = ac_level[24] ? $unsigned(-ac_level) : $unsigned(ac_level);
 assign dc_abs = dc_level_wide[24]
     ? $unsigned(-dc_level_wide) : $unsigned(dc_level_wide);
-assign dc_abs_scaled = dc_abs >> 2;
+assign dc_abs_scaled = dc_abs >> 3;
 assign combined_level = (ac_abs > dc_abs_scaled) ? ac_abs : dc_abs_scaled;
 
 
