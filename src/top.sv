@@ -263,10 +263,14 @@ assign clamp_in = /*dc_remover_out*/bass_boost_out;
 
 always @ (posedge clk_44k)
 begin
+    /*
     if(clamp_in > 32000) clamp_out <= 32000;
     else
     if(clamp_in < -32000) clamp_out  <= -32000;
     else clamp_out <= clamp_in[15:0];
+    */
+
+    if(clamp_in < 32000 && clamp_in > -32000) clamp_out <= clamp_in[15:0];
 end
 
 wire signed [15:0]volume_audio_out;
