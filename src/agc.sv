@@ -97,9 +97,9 @@ assign error = target - abs_out;
 // Rise timing assumes gain above the rise reference floor.
 // These are MAXIMUM rates; the original error integrator may be slower.
 localparam integer GAIN_RISE_RATE_BITS = 12;
-wire [7:0] gain_rise_rate_bits = (mode == 0) ? 12 : 8;
+wire [7:0] gain_rise_rate_bits = (mode == 0) ? 12 : 9;
 localparam integer GAIN_RISE_RATE_BITS_HANG = 16;
-wire [7:0] gain_fall_rate_bits = (mode == 0) ? 7 : 8;
+wire [7:0] gain_fall_rate_bits = (mode == 0) ? 7 : 9;
 
 // A floor for the RISE limiter only. Without it, starting from
 // gain_itgr == 0 would take extremely long. This is in gain units
