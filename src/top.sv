@@ -270,15 +270,24 @@ begin
     else clamp_out <= clamp_in[15:0];
     */
 
-    if(clamp_in < 32000 && clamp_in > -32000) clamp_out <= clamp_in[15:0];
+    if(clamp_in < 32767 && clamp_in > -32767) clamp_out <= clamp_in[15:0];
 end
+
+wire [15:0]soft_clip_out;
+
+soft_clip inst_soft_clip
+(
+    .samp_clk(clk_44k),
+    .audio_in(clamp_out),
+    .audio_out(soft_clip_out)
+);
 
 wire signed [15:0]volume_audio_out;
 
 volume_control inst_volume
 (
     .volume_5bit_in(volume_5bit),
-    .audio_in(clamp_out),
+    .audio_in(soft_clip_out),
     .audio_out(volume_audio_out),
     .clk_44k(clk_44k)
 );
