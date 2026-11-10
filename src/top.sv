@@ -286,10 +286,11 @@ wire signed [15:0]volume_audio_out;
 
 volume_control inst_volume
 (
-    .volume_5bit_in(volume_5bit),
+    .volume_in(volume_5bit),
     .audio_in(soft_clip_out),
     .audio_out(volume_audio_out),
-    .clk_44k(clk_44k)
+    .clk_44k(clk_44k),
+    .clk_H(clk_70M)
 );
 
 wire signed [15:0]depop_bias_out;

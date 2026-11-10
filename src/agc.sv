@@ -26,7 +26,7 @@ localparam integer AUDIO_DELAY    = 1024;
 
 
 localparam TARGET_SSB = 6000;
-localparam TARGET_AM = 2500;
+localparam TARGET_AM = 3000;
 localparam TARGET_AM_SQ = 2000;
 
 // --------------------------------------------------
