@@ -99,7 +99,7 @@ assign error = target - abs_out;
 localparam integer GAIN_RISE_RATE_BITS = 12;
 wire [7:0] gain_rise_rate_bits = (mode == 0) ? 12 : 9;
 localparam integer GAIN_RISE_RATE_BITS_HANG = 16;
-wire [7:0] gain_fall_rate_bits = (mode == 0) ? 7 : 8;
+wire [7:0] gain_fall_rate_bits = (mode == 0) ? 7 : 9;
 
 // A floor for the RISE limiter only. Without it, starting from
 // gain_itgr == 0 would take extremely long. This is in gain units
@@ -221,7 +221,7 @@ wire [24:0] combined_level;
 assign ac_abs = ac_level[24] ? $unsigned(-ac_level) : $unsigned(ac_level);
 assign dc_abs = dc_level_wide[24]
     ? $unsigned(-dc_level_wide) : $unsigned(dc_level_wide);
-assign dc_abs_scaled = dc_abs >> 3;
+assign dc_abs_scaled = (dc_abs >> 3) + (dc_abs >> 4);
 assign combined_level = (ac_abs > dc_abs_scaled) ? ac_abs : dc_abs_scaled;
 
 
