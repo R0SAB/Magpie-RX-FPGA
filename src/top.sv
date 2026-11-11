@@ -263,14 +263,12 @@ assign clamp_in = /*dc_remover_out*/bass_boost_out;
 
 always @ (posedge clk_44k)
 begin
-    /*
-    if(clamp_in > 32000) clamp_out <= 32000;
+    
+    if(clamp_in > 32767) clamp_out <= 32767;
     else
-    if(clamp_in < -32000) clamp_out  <= -32000;
+    if(clamp_in < -32767) clamp_out <= -32767;
     else clamp_out <= clamp_in[15:0];
-    */
-
-    if(clamp_in < 32767 && clamp_in > -32767) clamp_out <= clamp_in[15:0];
+    
 end
 
 wire [15:0]soft_clip_out;
@@ -314,8 +312,8 @@ spdif_tx
 )
 inst_spdif
 (
-    .L_in(clamp_out),
-    .R_in(clamp_out),
+    .L_in(soft_clip_out),
+    .R_in(soft_clip_out),
     .samp_clk_in(clk_44k),
     .clk_H(clk_70M),
     .spdif_out(spdif_out)
