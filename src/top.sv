@@ -326,6 +326,9 @@ inst_spdif
 
 wire ss_clk_H;
 
+assign mcu_ss_clk = 0;
+
+/*
 mcu_ss_pll your_instance_name
 (
     .clkout0(ss_clk_H),
@@ -337,7 +340,7 @@ mcu_ss_generator inst_mcu_ss
     .clk_H(ss_clk_H),           // 200 MHz
     .ss_clk_out(mcu_ss_clk)       // 8 MHz + 1/32
 );
-
+*/
 
 
 endmodule
