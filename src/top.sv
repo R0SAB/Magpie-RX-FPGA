@@ -219,14 +219,14 @@ s_meter inst_s_meter
 
 wire signed [23:0]agc_out;
 
-agc inst_agc
+agc_feedforward inst_agc
 (
     .audio_in(mod_switch_out),
     .audio_out(agc_out),
     .clk_44k(clk_44k),
-    .clk_70M(clk_70M),
-    .mode((modulation == MOD_AM) ? 1 : 0),
-    .am_squelch(status_sync_lock)           // Good signal: 1
+    .clk_H(clk_70M) //,
+    //.mode((modulation == MOD_AM) ? 1 : 0),
+    //.am_squelch(status_sync_lock)           // Good signal: 1
 );
 
 
