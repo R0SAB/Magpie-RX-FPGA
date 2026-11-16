@@ -27,11 +27,11 @@ module agc_feedforward #(
     // --------------------------------------------------
     // Configuration and combined AC/DC input level detector
     // --------------------------------------------------
-    reg [23:0] target = 24'd4000;
+    reg [23:0] target = 24'd5000;
     wire [23:0] input_level;
 
     localparam integer DC_TAU_BITS = 7;
-    localparam integer DC_ATTEN_BITS = 3;
+    localparam integer DC_ATTEN_BITS = 2;
     localparam integer LEVEL_TAU_BITS = 12;
     // Positive level errors are multiplied by 2^ATTACK_BITS.
     // Valid range: 0 <= ATTACK_BITS <= LEVEL_TAU_BITS.
@@ -54,7 +54,7 @@ module agc_feedforward #(
         ? $unsigned(-ac_level) : $unsigned(ac_level);
     wire [24:0] dc_abs = dc_wide[24]
         ? $unsigned(-dc_wide) : $unsigned(dc_wide);
-    wire [24:0] dc_scaled = dc_abs >> DC_ATTEN_BITS;
+    wire [24:0] dc_scaled = (dc_abs >> DC_ATTEN_BITS) - (dc_abs >> (DC_ATTEN_BITS+2));
     wire [24:0] combined_level =
         (ac_abs > dc_scaled) ? ac_abs : dc_scaled;
 
